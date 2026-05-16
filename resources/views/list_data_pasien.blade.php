@@ -64,19 +64,46 @@
 </head>
 <body class="bg-pos-bg text-pos-text min-h-screen flex flex-col font-sans">
     <!-- ── TOP BAR ── -->
-    <header class="w-full h-[70px] bg-pos-teal flex items-center px-10 shadow-[0_2px_12px_rgba(0,0,0,0.12)] shrink-0">
-        <div class="text-[1.1rem] font-extrabold text-white tracking-[0.08em]">POSYANDU</div>
+    <header class="w-full h-[70px] bg-pos-teal flex items-center justify-between px-10 shadow-[0_2px_12px_rgba(0,0,0,0.12)] shrink-0">
+      <div class="flex items-center gap-3">
+        <img src="{{ asset('image/logo.png') }}" class="h-10 w-auto brightness-0 invert" alt="Logo" />
+        <span class="text-white font-bold text-xl tracking-tight">POSYANDU</span>
+      </div>
+      <div class="flex items-center gap-6">
+        <div class="text-white text-right">
+          <p class="text-sm font-bold leading-none">{{ Auth::user()->name }}</p>
+          <p class="text-[0.7rem] opacity-80 uppercase tracking-widest mt-1">{{ Auth::user()->role }}</p>
+        </div>
+        <form action="{{ route('logout') }}" method="POST">
+          @csrf
+          <button type="submit" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all" title="Logout">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          </button>
+        </form>
+      </div>
     </header>
 
     <main class="flex-1 px-10 py-9 pb-12 max-w-[1300px] w-full mx-auto">
-        <h1 class="text-[1.75rem] font-extrabold text-pos-text mb-6">List Data Pasien</h1>
+        <div class="flex items-center justify-between mb-6">
+          <h1 class="text-[1.75rem] font-extrabold text-pos-text">List Data Pasien</h1>
+          <div class="flex items-center gap-3">
+            <a href="/laporan" class="flex items-center gap-2 px-4 py-[10px] bg-white border border-pos-border rounded-lg text-[0.87rem] font-bold text-pos-text hover:bg-pos-teal-light hover:text-pos-teal hover:border-pos-teal transition-all">
+              <i class="ti ti-report text-lg"></i> Laporan
+            </a>
+            @if(Auth::user()->role === 'admin')
+            <a href="/data_akun" class="flex items-center gap-2 px-4 py-[10px] bg-white border border-pos-border rounded-lg text-[0.87rem] font-bold text-pos-text hover:bg-pos-teal-light hover:text-pos-teal hover:border-pos-teal transition-all">
+              <i class="ti ti-users text-lg"></i> Kelola Akun
+            </a>
+            @endif
+          </div>
+        </div>
 
         <div class="toolbar flex items-center gap-[14px] mb-6 flex-wrap">
-            <button class="btn-tambah" onclick="document.getElementById('katOverlay').classList.add('open')">
+            <button class="btn-tambah" onclick="document.getElementById('katOverlay').classList.remove('hidden'); document.getElementById('katOverlay').classList.add('flex')">
                 Tambah Data
                 <span class="w-[26px] h-[26px] bg-white/25 rounded-md flex items-center justify-center text-[1.1rem] font-black leading-none">+</span>
             </button>
-            <span class="text-[0.87rem] text-pos-muted whitespace-nowrap mr-1" id="infoCount">Menampilkan 5 dari 5 data</span>
+            <span class="text-[0.87rem] text-pos-muted whitespace-nowrap mr-1" id="infoCount">Menampilkan 0 dari 0 data</span>
             <div class="grow"></div>
 
             <!-- Dropdown: Kategori -->
@@ -126,29 +153,27 @@
             </div>
             <div class="p-2.5 flex flex-col gap-2" id="tblBody"></div>
         </div>
-
-        <div class="flex items-center justify-end gap-[6px] mt-5" id="pagination"></div>
     </main>
 
     <!-- POPUP PILIH KATEGORI -->
-    <div class="hidden fixed inset-0 bg-black/45 z-[200] items-center justify-center backdrop-blur-[4px] animate-[fadeIn_0.2s_ease]" id="katOverlay" onclick="if(event.target===this) this.classList.remove('open')">
+    <div class="hidden fixed inset-0 bg-black/45 z-[200] items-center justify-center backdrop-blur-[4px] animate-[fadeIn_0.2s_ease]" id="katOverlay" onclick="if(event.target===this) { this.classList.add('hidden'); this.classList.remove('flex'); }">
         <div class="bg-white rounded-[20px] p-9 pb-10 w-full max-w-[480px] shadow-[0_24px_64px_rgba(0,0,0,0.22)] animate-[slideUp_0.28s_cubic-bezier(0.22,0.68,0,1.2)] relative">
-            <button class="absolute top-4 right-[18px] bg-none border-none text-[1.3rem] text-pos-muted hover:text-pos-text transition-colors leading-none" onclick="document.getElementById('katOverlay').classList.remove('open')">✕</button>
+            <button class="absolute top-4 right-[18px] bg-none border-none text-[1.3rem] text-pos-muted hover:text-pos-text transition-colors leading-none" onclick="document.getElementById('katOverlay').classList.add('hidden'); document.getElementById('katOverlay').classList.remove('flex');">✕</button>
             <h2 class="text-[1.1rem] font-extrabold text-pos-text mb-[6px] text-center">Pilih Kategori Pasien</h2>
             <p class="text-[0.84rem] text-pos-muted text-center mb-7">Pilih kategori untuk melanjutkan pendaftaran</p>
             <div class="flex gap-[14px] justify-center">
-                <a href="/form_ibu_hamil" class="flex-1 max-w-[130px] bg-pos-bg border-2 border-pos-border rounded-[16px] p-[22px_14px_18px] flex flex-col items-center gap-[10px] cursor-pointer no-underline transition-all hover:border-pos-teal hover:bg-white hover:-translate-y-1 hover:shadow-[0_10px_28px_rgba(14,118,109,0.15)] group">
+                <button onclick="openForm('ibu')" class="flex-1 max-w-[130px] bg-pos-bg border-2 border-pos-border rounded-[16px] p-[22px_14px_18px] flex flex-col items-center gap-[10px] cursor-pointer no-underline transition-all hover:border-pos-teal hover:bg-white hover:-translate-y-1 hover:shadow-[0_10px_28px_rgba(14,118,109,0.15)] group">
                     <div class="w-[52px] h-[52px] rounded-14px bg-[#d4eeeb] flex items-center justify-center text-[1.6rem] transition-colors group-hover:bg-pos-teal">
                         <span class="group-hover:brightness-[10]">🤰</span>
                     </div>
                     <div class="text-[0.88rem] font-bold text-pos-text text-center">Ibu Hamil</div>
-                </a>
-                <a href="/form_balita" class="flex-1 max-w-[130px] bg-pos-bg border-2 border-pos-border rounded-[16px] p-[22px_14px_18px] flex flex-col items-center gap-[10px] cursor-pointer no-underline transition-all hover:border-pos-teal hover:bg-white hover:-translate-y-1 hover:shadow-[0_10px_28px_rgba(14,118,109,0.15)] group">
+                </button>
+                <button onclick="openForm('balita')" class="flex-1 max-w-[130px] bg-pos-bg border-2 border-pos-border rounded-[16px] p-[22px_14px_18px] flex flex-col items-center gap-[10px] cursor-pointer no-underline transition-all hover:border-pos-teal hover:bg-white hover:-translate-y-1 hover:shadow-[0_10px_28px_rgba(14,118,109,0.15)] group">
                     <div class="w-[52px] h-[52px] rounded-14px bg-[#d4eeeb] flex items-center justify-center text-[1.6rem] transition-colors group-hover:bg-pos-teal">
                         <span class="group-hover:brightness-[10]">👶</span>
                     </div>
                     <div class="text-[0.88rem] font-bold text-pos-text text-center">Balita</div>
-                </a>
+                </button>
             </div>
         </div>
     </div>
@@ -158,6 +183,7 @@
         <div class="bg-white rounded-2xl p-[32px_36px] w-full max-w-[520px] shadow-[0_20px_60px_rgba(0,0,0,0.2)] animate-[slideUp_0.25s_cubic-bezier(0.22,0.68,0,1.2)]">
             <h2 id="modalTitle" class="text-[1.15rem] font-extrabold text-pos-text mb-6">Tambah Data Pasien</h2>
             <div class="grid grid-cols-2 gap-4 mb-6">
+                <input type="hidden" id="fKategori" />
                 <div class="col-span-full">
                     <label class="block text-[0.8rem] font-bold text-pos-teal-dark mb-[5px] uppercase tracking-wider">Nama Lengkap</label>
                     <input type="text" id="fNama" class="w-full px-[14px] py-[10px] border-[1.5px] border-pos-border rounded-lg text-[0.9rem] outline-none transition-all focus:border-pos-teal focus:shadow-[0_0_0_3px_rgba(14,118,109,0.1)]" placeholder="Nama lengkap pasien" />
@@ -190,9 +216,7 @@
         </div>
     </div>
 
-    <!-- ═══════════════════════════════════════════════════
-         DETAIL SIDE PANEL
-    ═══════════════════════════════════════════════════ -->
+    <!-- DETAIL SIDE PANEL -->
     <div id="detailOverlay" class="hidden fixed inset-0 bg-black/35 z-[999] animate-[fadeIn_0.25s_ease]" onclick="handleOverlayClick(event)">
       <div id="detailPanel" class="fixed top-0 right-0 w-[420px] h-screen bg-pos-bg overflow-y-auto translate-x-full transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex flex-col z-[1000] shadow-[-8px_0_40px_rgba(0,0,0,0.18)]">
         <div id="dpBody" class="grow p-[14px] flex flex-col gap-3 pb-[90px]"></div>
@@ -204,39 +228,24 @@
 
     <script>
         /* ── DATA ── */
-        let data = [
-            { id:1, nama:'Siti Aminah',     nik:'3508010101980001', hp:'081234567890', alamat:'Jl. Mawar No. 12',   dusun:'Krajan',     kecamatan:'Sumbersari', kategori:'ibu',    anakKe:1, tglKunjungan:'2025-02-28', usiaHamil:28 },
-            { id:2, nama:'Dewi Rahayu',     nik:'3508010202990002', hp:'082345678901', alamat:'Jl. Melati No. 5',   dusun:'Tegal Boto', kecamatan:'Kaliwates',  kategori:'balita', anakKe:2, tglKunjungan:'2026-01-05', usiaHamil:null },
-            { id:3, nama:'Nur Halimah',     nik:'3508010303000003', hp:'083456789012', alamat:'Jl. Kenanga No. 8',  dusun:'Patrang',    kecamatan:'Patrang',    kategori:'ibu',    anakKe:1, tglKunjungan:'2025-11-20', usiaHamil:32 },
-            { id:4, nama:'Fatimah Azzahra', nik:'3508010505020005', hp:'085678901234', alamat:'Jl. Anggrek No. 17', dusun:'Mojosari',   kecamatan:'Ajung',      kategori:'ibu',    anakKe:1, tglKunjungan:'2026-02-28', usiaHamil:20 },
-            { id:5, nama:'Bagas Pratama',   nik:'3508010606030005', hp:'086789012345', alamat:'Jl. Cempaka No. 4',  dusun:'Mangli',     kecamatan:'Kaliwates',  kategori:'balita', anakKe:1, tglKunjungan:'2026-03-10', usiaHamil:null },
-        ];
-
-        let nextId = 6;
-        let editId = null;
+        let data = @json($patients);
         let filtered = [...data];
-
-        const riwayatDummy = {
-            1: [{ tgl: '29-02-2003' }, { tgl: '29-02-2003' }],
-            2: [{ tgl: '10-01-2025' }],
-            3: [{ tgl: '15-03-2025' }, { tgl: '20-04-2025' }],
-            4: [{ tgl: '05-02-2025' }],
-            5: [{ tgl: '28-02-2025' }, { tgl: '28-02-2025' }],
-        };
+        let currentSort = '';
+        let currentKat = '';
 
         function render() {
             const body = document.getElementById('tblBody');
             document.getElementById('infoCount').textContent = 'Menampilkan ' + filtered.length + ' dari ' + data.length + ' data';
 
             if (filtered.length === 0) {
-                body.innerHTML = '<div class="flex flex-col items-center justify-center p-[60px_20px] text-pos-muted gap-2.5"><svg class="opacity-30" xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7m16 0v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-5m16 0H4"/></svg><p class="text-[0.9rem]">Tidak ada data ditemukan</p></div>';
+                body.innerHTML = '<div class="flex flex-col items-center justify-center p-[60px_20px] text-pos-muted gap-2.5"><i class="ti ti-database-off text-5xl opacity-20"></i><p class="text-[0.9rem]">Tidak ada data ditemukan</p></div>';
                 return;
             }
 
             body.innerHTML = filtered.map((d, i) => {
-                const kategoriLabel = d.kategori === 'ibu' ? 'Ibu Hamil' : 'Balita';
+                const kategoriLabel = d.kategori === 'ibu' ? 'Ibu Hamil' : (d.kategori === 'balita' ? 'Balita' : 'Lansia');
                 return `
-                <div class="grid grid-cols-[46px_1.3fr_178px_1fr_115px_115px_60px] items-center px-2 border-[1.5px] border-pos-border rounded-[10px] min-h-[58px] bg-white transition-all duration-200 hover:shadow-[0_4px_16px_rgba(14,118,109,0.1)] hover:border-[#b0d5d1] hover:bg-[#f9fffe] animate-[rowIn_0.4s_ease_both] cursor-pointer" style="animation-delay:${i * 0.05}s" onclick="goToForm(${d.id}, '${d.kategori}')">
+                <div class="grid grid-cols-[46px_1.3fr_178px_1fr_115px_115px_60px] items-center px-2 border-[1.5px] border-pos-border rounded-[10px] min-h-[58px] bg-white transition-all duration-200 hover:shadow-[0_4px_16px_rgba(14,118,109,0.1)] hover:border-[#b0d5d1] hover:bg-[#f9fffe] animate-[rowIn_0.4s_ease_both] cursor-pointer" style="animation-delay:${i * 0.05}s" onclick="goToForm(${d.id})">
                     <div class="px-3 py-[14px] text-sm font-bold text-pos-teal text-center">${i + 1}</div>
                     <div class="px-3 py-[14px] text-[0.875rem] text-pos-text leading-[1.4]">${d.nama}</div>
                     <div class="px-3 py-[14px] text-[0.875rem] text-pos-text leading-[1.4]">${d.nik}</div>
@@ -245,153 +254,228 @@
                     <div class="px-3 py-[14px] text-[0.875rem] text-pos-text leading-[1.4]"><span class="badge-kategori ${d.kategori}">${kategoriLabel}</span></div>
                     <div class="px-3 py-[14px] flex gap-[6px] items-center justify-center">
                         <button class="w-8 h-8 flex items-center justify-center bg-pos-teal-light text-pos-teal-dark rounded-md border-none cursor-pointer transition-all hover:opacity-85 hover:-translate-y-[1px]" onclick="event.stopPropagation(); lihat(${d.id})" title="Lihat Detail">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.27 2.943 9.542 7-1.272 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            <i class="ti ti-eye"></i>
                         </button>
                     </div>
-                </div>
-            `;
+                </div>`;
             }).join('');
         }
 
-        let activeKat  = '';
-        let activeSort = '';
-
         function toggleDD(id) {
-            const el = document.getElementById(id).querySelector('div:nth-child(2)');
-            const isOpen = !el.classList.contains('hidden');
-            document.querySelectorAll('.relative.select-none div:nth-child(2)').forEach(d => d.classList.add('hidden'));
-            if (!isOpen) el.classList.remove('hidden');
+            const dd = document.getElementById(id).querySelector('div:last-child');
+            const svg = document.getElementById(id).querySelector('svg');
+            const isHidden = dd.classList.contains('hidden');
+            document.querySelectorAll('[id^="dd"] div:last-child').forEach(d => d.classList.add('hidden'));
+            document.querySelectorAll('[id^="dd"] svg').forEach(s => s.classList.remove('rotate-180'));
+            if(isHidden) { dd.classList.remove('hidden'); svg.classList.add('rotate-180'); }
         }
 
-        function pickKat(item) {
-            activeKat = item.dataset.val;
-            document.getElementById('ddKatLabel').textContent = item.dataset.label;
-            item.closest('div').querySelectorAll('div').forEach(i => i.classList.remove('active', 'bg-pos-teal-light', 'text-pos-teal-dark', 'font-bold'));
-            item.classList.add('active', 'bg-pos-teal-light', 'text-pos-teal-dark', 'font-bold');
-            item.closest('div').classList.add('hidden');
+        function pickKat(el) {
+            currentKat = el.dataset.val;
+            document.getElementById('ddKatLabel').textContent = el.dataset.label;
+            document.querySelectorAll('#ddKategori div:last-child div').forEach(d => d.classList.remove('active', 'bg-pos-teal-light', 'text-pos-teal-dark', 'font-bold'));
+            el.classList.add('active', 'bg-pos-teal-light', 'text-pos-teal-dark', 'font-bold');
             applyFilter();
         }
 
-        function pickSort(item) {
-            activeSort = item.dataset.val;
-            document.getElementById('ddSortLabel').textContent = item.dataset.label;
-            item.closest('div').querySelectorAll('div').forEach(i => i.classList.remove('active', 'bg-pos-teal-light', 'text-pos-teal-dark', 'font-bold'));
-            item.classList.add('active', 'bg-pos-teal-light', 'text-pos-teal-dark', 'font-bold');
-            item.closest('div').classList.add('hidden');
+        function pickSort(el) {
+            currentSort = el.dataset.val;
+            document.getElementById('ddSortLabel').textContent = el.dataset.label;
+            document.querySelectorAll('#ddSort div:last-child div').forEach(d => d.classList.remove('active', 'bg-pos-teal-light', 'text-pos-teal-dark', 'font-bold'));
+            el.classList.add('active', 'bg-pos-teal-light', 'text-pos-teal-dark', 'font-bold');
             applyFilter();
         }
-
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.relative.select-none')) {
-                document.querySelectorAll('.relative.select-none div:nth-child(2)').forEach(d => d.classList.add('hidden'));
-            }
-        });
 
         function applyFilter() {
-            const q = document.getElementById('searchInput').value.toLowerCase();
+            const search = document.getElementById('searchInput').value.toLowerCase();
             filtered = data.filter(d => {
-                const matchKat = !activeKat || d.kategori === activeKat;
-                const matchQ   = !q || d.nama.toLowerCase().includes(q) || d.nik.includes(q) || d.alamat.toLowerCase().includes(q) || d.kecamatan.toLowerCase().includes(q);
-                return matchKat && matchQ;
+                const matchKat = !currentKat || d.kategori === currentKat;
+                const matchSearch = !search || d.nama.toLowerCase().includes(search) || d.nik.includes(search) || d.alamat.toLowerCase().includes(search) || d.kecamatan.toLowerCase().includes(search);
+                return matchKat && matchSearch;
             });
-            if (activeSort === 'nama')           filtered.sort((a,b) => a.nama.localeCompare(b.nama));
-            else if (activeSort === 'nik')       filtered.sort((a,b) => a.nik.localeCompare(b.nik));
-            else if (activeSort === 'kecamatan') filtered.sort((a,b) => a.kecamatan.localeCompare(b.kecamatan));
+
+            if (currentSort === 'nama')           filtered.sort((a,b) => a.nama.localeCompare(b.nama));
+            else if (currentSort === 'nik')       filtered.sort((a,b) => a.nik.localeCompare(b.nik));
+            else if (currentSort === 'kecamatan') filtered.sort((a,b) => a.kecamatan.localeCompare(b.kecamatan));
+            else                                  filtered.sort((a,b) => b.id - a.id);
+            
             render();
         }
 
-        function openModal(prefill = null) {
-            editId = prefill ? prefill.id : null;
-            document.getElementById('modalTitle').textContent = prefill ? 'Edit Data Pasien' : 'Tambah Data Pasien';
-            ['Nama','Nik','Hp','Alamat','Dusun','Kecamatan'].forEach(f => {
-                document.getElementById('f'+f).value = prefill ? prefill[f.toLowerCase()] : '';
-            });
-            document.getElementById('modalOverlay').classList.remove('hidden');
-            document.getElementById('modalOverlay').classList.add('flex');
+        function openForm(kat) {
+            if (kat === 'ibu') window.location.href = '/form_ibu_hamil';
+            else if (kat === 'balita') window.location.href = '/form_balita';
         }
-        function closeModal() {
-            document.getElementById('modalOverlay').classList.add('hidden');
-            document.getElementById('modalOverlay').classList.remove('flex');
-            editId = null;
-        }
-        function saveData() {
-            const nama      = document.getElementById('fNama').value.trim();
-            const nik       = document.getElementById('fNik').value.trim();
-            const hp        = document.getElementById('fHp').value.trim();
-            const alamat    = document.getElementById('fAlamat').value.trim();
-            const dusun     = document.getElementById('fDusun').value.trim();
-            const kecamatan = document.getElementById('fKecamatan').value.trim();
-            if (!nama || !nik || !hp) { alert('Nama, NIK, dan No. HP wajib diisi.'); return; }
-            if (editId) {
-                const idx = data.findIndex(d => d.id === editId);
-                data[idx] = { ...data[idx], nama, nik, hp, alamat, dusun, kecamatan };
-            } else {
-                data.push({ id: nextId++, nama, nik, hp, alamat, dusun, kecamatan, kategori:'', anakKe:1, tglKunjungan:'-', usiaHamil:null });
-            }
-            closeModal();
-            applyFilter();
-        }
-        document.getElementById('modalOverlay').addEventListener('click', function(e) {
-            if (e.target === this) closeModal();
-        });
 
-        function goToForm(id, kategori) {
-            const pasien = data.find(d => d.id === id);
-            if (!pasien) return;
-            localStorage.setItem('currentPasien', JSON.stringify(pasien));
+        function closeModal() {
+            document.getElementById('katOverlay').classList.add('hidden');
+            document.getElementById('katOverlay').classList.remove('flex');
+        }
+
+        function goToForm(id) {
+            const p = data.find(x => x.id === id);
+            if(!p) return;
+            localStorage.setItem('currentPatient', JSON.stringify(p));
+            localStorage.removeItem('langkah2Data');
+            localStorage.removeItem('langkah3Data');
             window.location.href = '/langkah-1';
         }
 
-        function lihat(id) {
-            const d = data.find(d => d.id === id);
-            if (!d) return;
-            const riwayat = riwayatDummy[id] || [];
-            const langkahLabels = ['Langkah 1', 'Langkah 2', 'Langkah 3', 'Langkah 4'];
-            const accordions = langkahLabels.map((label, idx) => {
-              const accId = `acc-${id}-${idx}`;
-              const isOpen = idx === 0;
-              let fieldsHTML = '';
-              if (idx === 0) {
-                fieldsHTML = `<div class="flex flex-col gap-[11px] pt-[13px]"><div class="flex flex-col gap-[5px]"><div class="text-[12px] text-pos-muted flex items-center gap-[5px]"><i class="ti ti-clock text-sm"></i> Waktu Ke Posyandu</div><input class="w-full px-[13px] py-[10px] border-[0.5px] border-pos-border rounded-pos-radius-sm text-[14px] text-pos-text bg-[#f9f9f9] text-pos-muted cursor-default outline-none" type="date" value="${d.tglKunjungan}" readonly /></div>${d.usiaHamil != null ? `<div class="flex flex-col gap-[5px]"><div class="text-[12px] text-pos-muted flex items-center gap-[5px]"><i class="ti ti-heart text-sm"></i> Usia Kehamilan (Minggu)</div><input class="w-full px-[13px] py-[10px] border-[0.5px] border-pos-border rounded-pos-radius-sm text-[14px] text-pos-text bg-[#f9f9f9] text-pos-muted cursor-default outline-none" type="number" value="${d.usiaHamil}" readonly /></div>` : ''}</div>`;
-              } else {
-                fieldsHTML = `<p class="text-[13px] text-pos-muted pt-3">Data belum tersedia</p>`;
-              }
-              return `<div class="bg-white border-[0.5px] border-pos-border rounded-pos-radius overflow-hidden mb-3" id="${accId}"><button class="w-full flex items-center gap-[10px] p-[14px_16px] bg-none border-none cursor-pointer text-left transition-colors hover:bg-gray-50" onclick="toggleAcc('${accId}')"><i class="ti ti-file-description text-[17px] text-pos-muted"></i><span class="grow text-[14px] text-pos-text">${label}</span><i class="ti ti-chevron-down text-[15px] text-pos-muted transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}"></i></button><div class="px-4 pb-[14px] border-t border-pos-border ${isOpen ? 'block' : 'hidden'}">${fieldsHTML}</div></div>`;
-            }).join('');
+        async function lihat(id) {
+            const p = data.find(x => x.id === id);
+            if(!p) return;
 
-            const riwayatRows = riwayat.length > 0
-              ? riwayat.map(r => `<div class="grid grid-cols-2 border-b border-pos-border last:border-none"><div class="p-[11px_12px]"><div class="text-[11px] text-pos-muted flex items-center gap-1 mb-[6px] font-medium"><i class="ti ti-clock text-[13px]"></i> Tanggal Riwayat Pemeriksaan</div><input class="w-full px-[11px] py-2 border-[0.5px] border-pos-border rounded-pos-radius-sm text-[13px] text-pos-text bg-[#f9f9f9] cursor-default outline-none" type="text" value="${r.tgl}" readonly /></div><div class="p-[11px_12px] border-l border-pos-border flex flex-col justify-center"><div class="text-[11px] text-pos-muted flex items-center gap-1 mb-[6px] font-medium"><i class="ti ti-map-pin text-[13px]"></i> Aksi</div><a href="/riwayat?id=${d.id}&tgl=${r.tgl}" class="w-full p-[8px_10px] border-[0.5px] border-pos-border rounded-pos-radius-sm bg-none cursor-pointer text-[12px] text-pos-text transition-colors hover:bg-gray-100 no-underline text-center">Lihat Detail Riwayat</a></div></div>`).join('')
-              : `<p class="text-[13px] text-pos-muted p-[12px_16px]">Belum ada riwayat pemeriksaan</p>`;
+            const overlay = document.getElementById('detailOverlay');
+            const panel = document.getElementById('detailPanel');
+            const body = document.getElementById('dpBody');
 
-            document.getElementById('dpBody').innerHTML = `
-              <div class="bg-white flex flex-col items-center p-[28px_16px_8px]"><img src="{{ asset('image/logo.png') }}" class="w-[100px] h-auto" /></div>
-              <div class="bg-white flex items-center justify-center gap-[5px] py-2 pb-[14px] border-b border-pos-border"><div class="w-[7px] h-[7px] rounded-full bg-pos-green"></div><div class="w-1 h-1 rounded-full bg-pos-green opacity-30"></div><div class="w-1 h-1 rounded-full bg-pos-green opacity-30"></div></div>
-              <div class="bg-white border-[0.5px] border-pos-border rounded-pos-radius overflow-hidden"><div class="p-[13px_16px] border-b border-pos-border flex items-center gap-2 text-pos-muted"><i class="ti ti-user text-[17px]"></i><span class="text-[14px] font-semibold text-pos-text">Informasi Dasar</span></div><div class="p-[14px_16px] flex flex-col gap-[13px]"><div class="flex flex-col gap-[5px]"><div class="text-[12px] text-pos-muted flex items-center gap-[5px]"><i class="ti ti-user text-sm"></i> Nama Ibu</div><input class="w-full px-[13px] py-[10px] border-[0.5px] border-pos-border rounded-pos-radius-sm text-[14px] text-pos-text bg-[#f9f9f9] text-pos-muted cursor-default outline-none" type="text" value="${d.nama}" readonly /></div><div class="flex flex-col gap-[5px]"><div class="text-[12px] text-pos-muted flex items-center gap-[5px]"><i class="ti ti-baby-carriage text-sm"></i> Anak ke</div><input class="w-full px-[13px] py-[10px] border-[0.5px] border-pos-border rounded-pos-radius-sm text-[14px] text-pos-text bg-[#f9f9f9] text-pos-muted cursor-default outline-none" type="number" value="${d.anakKe}" readonly /></div></div></div>
-              ${accordions}
-              <div class="bg-white border-[0.5px] border-pos-border rounded-pos-radius overflow-hidden"><div class="p-[13px_16px] border-b border-pos-border font-semibold text-[14px] text-pos-text">Riwayat Pemeriksaan</div>${riwayatRows}</div>
-            `;
-            document.getElementById('detailOverlay').classList.remove('hidden');
-            setTimeout(() => document.getElementById('detailPanel').classList.remove('translate-x-full'), 10);
+            body.innerHTML = '<div class="p-8 text-center text-pos-muted"><i class="ti ti-loader animate-spin text-3xl"></i><p class="mt-2 text-sm font-medium">Mengambil riwayat medis...</p></div>';
+            overlay.classList.remove('hidden');
+            setTimeout(() => panel.classList.remove('translate-x-full'), 10);
+
+            try {
+                const response = await fetch(`/patients/${id}`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+                const detail = await response.json();
+
+                const historyHtml = detail.pemeriksaans.length > 0 
+                    ? detail.pemeriksaans.map((h, hIdx) => {
+                        const accId = `acc-${h.id}`;
+                        const isOpen = hIdx === 0;
+                        
+                        const tindakLanjutHtml = h.tindak_lanjut ? h.tindak_lanjut.map(tl => `
+                            <div class="flex items-start gap-2 text-[12px] text-pos-muted py-0.5">
+                                <i class="ti ti-circle-check text-pos-teal text-sm mt-0.5"></i>
+                                <span>${tl}</span>
+                            </div>
+                        `).join('') : '<p class="text-[12px] text-pos-muted italic">Tidak ada tindak lanjut</p>';
+
+                        return `
+                        <div class="bg-white border-[0.5px] border-pos-border rounded-pos-radius overflow-hidden mb-3 shadow-sm" id="${accId}">
+                            <button class="w-full flex items-center gap-[10px] p-[14px_16px] bg-none border-none cursor-pointer text-left transition-colors hover:bg-gray-50" onclick="toggleAcc('${accId}')">
+                                <i class="ti ti-calendar-event text-[18px] text-pos-teal"></i>
+                                <span class="grow text-[14px] font-bold text-pos-navy">${new Date(h.tgl_periksa).toLocaleDateString('id-ID')}</span>
+                                <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase ${h.level_risiko === 'rendah' ? 'bg-green-100 text-green-700' : (h.level_risiko === 'darurat' ? 'bg-red-600 text-white animate-pulse' : 'bg-red-100 text-red-700')}">${h.level_risiko}</span>
+                                <i class="ti ti-chevron-down text-[15px] text-pos-muted transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}"></i>
+                            </button>
+                            <div class="px-4 pb-[16px] border-t border-pos-border ${isOpen ? 'block' : 'hidden'}">
+                                <div class="grid grid-cols-2 gap-3 pt-4">
+                                    <div class="flex flex-col gap-0.5">
+                                        <span class="text-[10px] font-bold text-pos-muted uppercase tracking-tighter">Berat Badan</span>
+                                        <span class="text-sm font-bold text-pos-text">${h.berat_badan || '-'} kg</span>
+                                    </div>
+                                    <div class="flex flex-col gap-0.5">
+                                        <span class="text-[10px] font-bold text-pos-muted uppercase tracking-tighter">Tinggi Badan</span>
+                                        <span class="text-sm font-bold text-pos-text">${h.tinggi_badan || '-'} cm</span>
+                                    </div>
+                                    <div class="flex flex-col gap-0.5">
+                                        <span class="text-[10px] font-bold text-pos-muted uppercase tracking-tighter">Tekanan Darah</span>
+                                        <span class="text-sm font-bold text-pos-text">${h.tekanan_darah || '-'}</span>
+                                    </div>
+                                    <div class="flex flex-col gap-0.5">
+                                        <span class="text-[10px] font-bold text-pos-muted uppercase tracking-tighter">Level Risiko</span>
+                                        <span class="text-sm font-bold ${h.level_risiko === 'rendah' ? 'text-green-600' : 'text-red-600'} uppercase">${h.level_risiko}</span>
+                                    </div>
+                                </div>
+                                <div class="mt-4 pt-4 border-t border-dashed border-pos-border">
+                                    <span class="text-[10px] font-bold text-pos-navy uppercase tracking-widest block mb-2">Tindak Lanjut</span>
+                                    ${tindakLanjutHtml}
+                                </div>
+                            </div>
+                        </div>`;
+                    }).join('')
+                    : '<div class="bg-white border border-pos-border rounded-xl p-8 text-center"><i class="ti ti-notes-off text-3xl opacity-20 block mb-2"></i><p class="text-sm text-pos-muted">Belum ada riwayat skrining.</p></div>';
+
+                body.innerHTML = `
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-pos-border mb-4">
+                        <div class="flex items-center gap-4 mb-5 pb-5 border-b border-pos-border">
+                            <div class="w-14 h-14 rounded-full bg-pos-teal/10 flex items-center justify-center text-pos-teal">
+                                <i class="ti ti-user text-3xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-pos-navy font-extrabold text-lg leading-none">${detail.nama}</h3>
+                                <p class="text-xs text-pos-muted font-bold mt-1.5 tracking-wide uppercase">${detail.nik}</p>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2 text-pos-muted">
+                                    <i class="ti ti-map-pin text-lg"></i>
+                                    <span class="text-xs font-bold uppercase tracking-wider">Wilayah</span>
+                                </div>
+                                <span class="text-sm font-bold text-pos-text">${detail.kecamatan || '-'}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2 text-pos-muted">
+                                    <i class="ti ti-phone text-lg"></i>
+                                    <span class="text-xs font-bold uppercase tracking-wider">Kontak</span>
+                                </div>
+                                <span class="text-sm font-bold text-pos-text">${detail.noHp || '-'}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2 text-pos-muted">
+                                    <i class="ti ti-category text-lg"></i>
+                                    <span class="text-xs font-bold uppercase tracking-wider">Kategori</span>
+                                </div>
+                                <span class="px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase ${detail.kategori === 'ibu' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'}">${detail.kategori === 'ibu' ? 'Ibu Hamil' : 'Balita'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="px-1">
+                        <h3 class="text-pos-navy font-extrabold text-[0.95rem] mb-4 flex items-center gap-2">
+                            <i class="ti ti-history text-pos-teal"></i>
+                            Riwayat Pemeriksaan
+                            <span class="bg-pos-teal/10 text-pos-teal text-[10px] px-2 py-0.5 rounded-full">${detail.pemeriksaans.length}</span>
+                        </h3>
+                        <div class="flex flex-col">
+                            ${historyHtml}
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                body.innerHTML = '<div class="p-8 text-center text-red-500 font-bold"><i class="ti ti-alert-triangle text-3xl mb-2"></i><p>Gagal memuat data</p></div>';
+            }
         }
 
         function toggleAcc(id) {
-          const el = document.getElementById(id);
-          const body = el.querySelector('div:nth-child(2)');
-          const arrow = el.querySelector('i.ti-chevron-down');
-          body.classList.toggle('hidden');
-          arrow.classList.toggle('rotate-180');
+            const el = document.getElementById(id);
+            const body = el.querySelector('div:last-child');
+            const arrow = el.querySelector('i.ti-chevron-down');
+            const isHidden = body.classList.contains('hidden');
+            
+            // Close others (optional)
+            // document.querySelectorAll('[id^="acc-"] div:last-child').forEach(d => d.classList.add('hidden'));
+            // document.querySelectorAll('[id^="acc-"] i.ti-chevron-down').forEach(a => a.classList.remove('rotate-180'));
+
+            if (isHidden) {
+                body.classList.remove('hidden');
+                arrow.classList.add('rotate-180');
+            } else {
+                body.classList.add('hidden');
+                arrow.classList.remove('rotate-180');
+            }
         }
 
         function closeDetailPanel() {
-          document.getElementById('detailPanel').classList.add('translate-x-full');
-          setTimeout(() => document.getElementById('detailOverlay').classList.add('hidden'), 300);
+            const panel = document.getElementById('detailPanel');
+            panel.classList.add('translate-x-full');
+            setTimeout(() => document.getElementById('detailOverlay').classList.add('hidden'), 300);
         }
 
         function handleOverlayClick(e) {
-          if (e.target === document.getElementById('detailOverlay')) closeDetailPanel();
+            if (e.target.id === 'detailOverlay') closeDetailPanel();
         }
 
-        render();
+        window.onclick = function(event) {
+            if (!event.target.closest('.relative')) {
+                document.querySelectorAll('[id^="dd"] div:last-child').forEach(d => d.classList.add('hidden'));
+                document.querySelectorAll('[id^="dd"] svg').forEach(s => s.classList.remove('rotate-180'));
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', render);
     </script>
 </body>
 </html>

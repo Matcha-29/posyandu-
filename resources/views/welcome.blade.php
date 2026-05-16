@@ -218,8 +218,35 @@
             </main>
         </div>
 
+        <footer class="w-full lg:max-w-4xl max-w-[335px] mt-12 py-8 border-t border-[#19140035] dark:border-[#3E3E3A] flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex flex-col gap-2">
+                <h3 class="font-semibold text-lg">POSYANDU</h3>
+                <p class="text-[#706f6c] dark:text-[#A1A09A] text-xs">Dedicated to health excellence and community care.</p>
+                <div class="flex items-center gap-4 mt-2">
+                    <img src="{{ asset('image/logo_polije.png') }}" alt="Polije" class="h-14 w-auto transition-all hover:scale-110 drop-shadow-md" />
+                    <img src="{{ asset('image/logo_trkk.png') }}" alt="TRK" class="h-14 w-auto transition-all hover:scale-110 drop-shadow-md" />
+                </div>
+            </div>
+            <div class="flex gap-8 text-xs font-medium">
+                <div class="flex flex-col gap-2">
+                    <span class="uppercase tracking-wider text-[#706f6c] dark:text-[#A1A09A]">Links</span>
+                    <a href="#" class="hover:underline">About</a>
+                    <a href="#" class="hover:underline">Privacy</a>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <span class="uppercase tracking-wider text-[#706f6c] dark:text-[#A1A09A]">Contact</span>
+                    <a href="mailto:support@posyandu.id" class="hover:underline">Email Us</a>
+                    <a href="#" class="hover:underline">Help Center</a>
+                </div>
+            </div>
+            <div class="text-[10px] text-[#706f6c] dark:text-[#A1A09A] self-end md:self-center">
+                © 2024 Posyandu. All rights reserved.
+            </div>
+        </footer>
+
         @if (Route::has('login'))
             <div class="h-14.5 hidden lg:block"></div>
         @endif
     </body>
 </html>
+

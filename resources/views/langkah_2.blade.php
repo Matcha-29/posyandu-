@@ -3,155 +3,61 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Posyandu - Langkah 2</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Posyandu – Langkah 2</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --teal:#0E766D; --navy:#1a2e6e; --orange:#e85d26; --bg:#f0f4f8; --border:#d0d8e4; --text:#1c2340; }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);min-height:100vh}
+  .topbar{width:100%;height:80px;background:var(--teal)}
 
-  body {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    background: #f0f4f8;
-    min-height: 100vh;
-  }
+  .stepper-wrapper{padding:28px 40px 20px;display:flex;justify-content:center}
+  .stepper{display:flex;align-items:center;width:100%;max-width:860px}
+  .step{display:flex;flex-direction:column;align-items:center;z-index:1}
+  .step-circle{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;border:2px solid var(--border);background:var(--bg);color:#bbb;z-index:2;transition:all .3s}
+  .step-circle.done{background:#16a085;border-color:#16a085;color:#fff}
+  .step-circle.active{background:var(--navy);border-color:var(--navy);color:#fff;box-shadow:0 0 0 4px rgba(26,46,110,.15)}
+  .check-icon{display:none}.step-circle.done .check-icon{display:inline}.step-circle.done .step-num{display:none}
+  .step-label{margin-top:8px;font-size:12px;font-weight:600;color:#aaa;white-space:nowrap;display:flex;align-items:center;gap:4px}
+  .step-label.active-label{color:var(--navy)}.step-label.done-label{color:#16a085}
+  .step-done-badge{background:#16a085;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center}
+  .connector{flex:1;height:2px;background:var(--border);margin-bottom:22px}
+  .connector.done-line{background:#16a085}
 
-  :root { --teal: #0E766D; }
+  .main{padding:20px 32px 40px;max-width:1100px;margin:0 auto}
+  .card{background:#fff;border-radius:16px;border:2px solid #c8d5e0;padding:28px;display:flex;gap:24px;align-items:stretch}
 
-  .topbar {
-    width: 100%;
-    height: 80px;
-    background: var(--teal);
-    flex-shrink: 0;
-  }
+  .left-panel{flex:1.2;display:flex;flex-direction:column;gap:16px}
+  .avatar-circle{width:56px;height:56px;border-radius:50%;background:#cce4f9;display:flex;align-items:center;justify-content:center}
+  .avatar-circle svg{width:32px;height:32px;fill:#5ba4d4}
+  .table-wrapper{border:2px solid #c8d5e0;border-radius:8px;overflow:hidden;flex:1}
+  .data-table{width:100%;border-collapse:collapse}
+  .data-table thead tr{background:var(--teal);color:#fff}
+  .data-table th{padding:11px 13px;font-size:12px;font-weight:700;text-align:left}
+  .data-table td{padding:12px 13px;font-size:12px;color:var(--text)}
+  .data-table tbody tr:hover{background:#f0fffe}
 
-  .stepper-wrapper {
-    background: #f0f4f8;
-    padding: 28px 40px 24px;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-  }
+  .right-panel{flex:1;border:2px solid #c8d5e0;border-radius:12px;padding:22px;display:flex;flex-direction:column;gap:14px;margin-top:72px;min-height:480px}
+  .panel-title{background:var(--teal);color:#fff;border-radius:8px;padding:11px 16px;font-size:13px;font-weight:700;letter-spacing:.5px;text-align:center;width:100%}
 
-  .stepper {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    max-width: 860px;
-  }
+  /* Pengukuran fields */
+  .form-group{display:flex;flex-direction:column;gap:6px}
+  .form-label{font-size:12px;font-weight:700;color:var(--text)}
+  .form-input{border:1.5px solid var(--navy);border-radius:8px;padding:10px 13px;font-size:13px;font-family:inherit;color:var(--text);outline:none;transition:border-color .2s;background:#fff}
+  .form-input:focus{border-color:var(--teal)}
+  .form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
-  .step {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-    z-index: 1;
-  }
+  /* Balita section */
+  .section-label{font-size:12px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:.8px;border-bottom:2px solid #d4f0ec;padding-bottom:6px}
 
-  .step-circle {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 14px;
-    border: 2px solid #d0d0d0;
-    background: #f0f4f8;
-    color: #bbb;
-    position: relative;
-    z-index: 2;
-    transition: all 0.3s;
-  }
-
-  .step-circle.done { background: #16a085; border-color: #16a085; color: #fff; }
-  .step-circle.active { background: #1a2e6e; border-color: #1a2e6e; color: #fff; box-shadow: 0 0 0 4px rgba(26,46,110,0.15); }
-  .step-circle.pending { background: #f0f4f8; border-color: #d0d0d0; color: #bbb; }
-
-  .check-icon { display: none; }
-  .step-circle.done .check-icon { display: inline; }
-  .step-circle.done .step-num { display: none; }
-
-  .step-label {
-    margin-top: 8px;
-    font-size: 12px;
-    font-weight: 600;
-    color: #aaa;
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-  .step-label.active-label { color: #1a2e6e; }
-  .step-label.done-label { color: #16a085; }
-
-  .step-done-badge {
-    background: #16a085;
-    border-radius: 50%;
-    width: 16px; height: 16px;
-    display: flex; align-items: center; justify-content: center;
-  }
-
-  .connector {
-    flex: 1;
-    height: 2px;
-    background: #d0d0d0;
-    margin-bottom: 22px;
-    z-index: 0;
-  }
-  .connector.done-line { background: #16a085; }
-
-  .main { padding: 24px 32px; max-width: 1100px; margin: 0 auto; }
-
-  .card {
-    background: #fff;
-    border-radius: 16px;
-    border: 2px solid #111;
-    padding: 28px;
-    display: flex;
-    gap: 24px;
-    align-items: stretch;
-  }
-
-  .left-panel { flex: 1.2; display: flex; flex-direction: column; gap: 20px; }
-  .avatar-circle { width: 60px; height: 60px; border-radius: 50%; background: #cce4f9; display: flex; align-items: center; justify-content: center; }
-  .avatar-circle svg { width: 34px; height: 34px; fill: #5ba4d4; }
-  .table-wrapper { border: 2px solid #111; border-radius: 8px; overflow: hidden; flex: 1; }
-  .data-table { width: 100%; border-collapse: collapse; }
-  .data-table thead tr { background: #0e7c7b; color: #fff; }
-  .data-table th { padding: 12px 14px; font-size: 13px; font-weight: 600; text-align: left; }
-  .data-table td { padding: 13px 14px; font-size: 13px; color: #374151; }
-  .data-table tbody tr:hover { background: #f8fffe; }
-
-  .right-panel {
-    flex: 1; border: 2px solid #111; border-radius: 12px;
-    padding: 24px; display: flex; flex-direction: column;
-    gap: 18px; margin-top: 80px; min-height: 550px;
-  }
-
-  .form-title-btn {
-    background: #0e7c7b; color: #fff; border: none; border-radius: 8px;
-    padding: 12px 16px; font-size: 13px; font-weight: 700;
-    letter-spacing: 0.5px; text-align: center; font-family: inherit; width: 100%;
-  }
-
-  .form-group { display: flex; flex-direction: column; gap: 6px; }
-  .form-label { font-size: 13px; font-weight: 600; color: #374151; }
-  .form-input {
-    border: 1.5px solid #1a2e6e; border-radius: 8px;
-    padding: 12px 14px; font-size: 14px; font-family: inherit;
-    color: #374151; outline: none; transition: border-color 0.2s; background: #fff;
-  }
-  .form-input:focus { border-color: #0e7c7b; }
-
-  .form-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: auto; padding-top: 12px; }
-  .btn-back { background: #e85d26; color: #fff; border: none; border-radius: 8px; padding: 12px 28px; font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer; transition: opacity 0.2s; }
-  .btn-back:hover { opacity: 0.88; }
-  .btn-next { background: #1a2e6e; color: #fff; border: none; border-radius: 8px; padding: 12px 28px; font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer; transition: opacity 0.2s; }
-  .btn-next:hover { opacity: 0.88; }
+  .form-actions{display:flex;gap:12px;justify-content:flex-end;margin-top:auto;padding-top:10px}
+  .btn-back{background:var(--orange);color:#fff;border:none;border-radius:8px;padding:11px 26px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;transition:opacity .2s}
+  .btn-back:hover{opacity:.88}
+  .btn-next{background:var(--navy);color:#fff;border:none;border-radius:8px;padding:11px 26px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;transition:opacity .2s}
+  .btn-next:hover{opacity:.88}
 </style>
 </head>
 <body>
-
 <div class="topbar"></div>
 
 <div class="stepper-wrapper">
@@ -189,28 +95,22 @@
       </div>
       <div class="table-wrapper">
         <table class="data-table">
-          <thead><tr><th>#</th><th>Nama Pasien</th><th>NIK</th><th>Waktu Ke Posyandu</th><th>Usia Ke Hamilan</th></tr></thead>
-          <tbody><tr><td>1</td><td>Najwa Yufentina</td><td>3509308707090002</td><td>29 - 03 - 2024</td><td>29</td></tr></tbody>
+          <thead>
+            <tr><th>#</th><th>Nama Pasien</th><th>NIK</th><th>Kunjungan</th><th>Kategori</th></tr>
+          </thead>
+          <tbody id="pasienTable">
+            <tr><td colspan="5" style="text-align:center;color:#999;padding:20px">Memuat data...</td></tr>
+          </tbody>
         </table>
       </div>
     </div>
+
     <div class="right-panel">
-      <div class="form-title-btn">FORMULIR UNTUK IBU HAMIL</div>
-      <div class="form-group">
-        <label class="form-label">Berat Badan (Kg) :</label>
-        <input class="form-input" type="number" value="10" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Lingkar Lengan Atas (Lila) (cm) :</label>
-        <input class="form-input" type="number" value="33" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Tekanan Darah Sistole/Diastole (mm/hg) :</label>
-        <input class="form-input" type="text" value="29" />
-      </div>
+      <div class="panel-title" id="panelTitle">DATA PENGUKURAN</div>
+      <div id="formFields"></div>
       <div class="form-actions">
-        <button class="btn-back" onclick="window.location.href='/langkah-1'">Kembali</button>
-        <button class="btn-next" onclick="window.location.href='/langkah-3'">Lanjut</button>
+        <button class="btn-back" onclick="goBack()">Kembali</button>
+        <button class="btn-next" onclick="simpanDanLanjut()">Lanjut</button>
       </div>
     </div>
   </div>
@@ -218,23 +118,115 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    const pasien = JSON.parse(localStorage.getItem('currentPasien') || 'null');
-    if (!pasien) return;
-    const kategoriLabel = pasien.kategori === 'ibu' ? 'Ibu Hamil' : 'Balita';
-    const tbody = document.querySelector('.data-table tbody');
-    if (tbody) {
-      tbody.innerHTML = `<tr>
-        <td>1</td>
-        <td>${pasien.nama}</td>
-        <td>${pasien.nik}</td>
-        <td>${pasien.tglKunjungan}</td>
-        <td>${pasien.usiaHamil != null ? pasien.usiaHamil + ' minggu' : '-'}</td>
-      </tr>`;
+    const raw = localStorage.getItem('currentPatient');
+    if (!raw) {
+      alert('Data pasien tidak ditemukan.');
+      window.location.href = '/list_data_pasien';
+      return;
     }
-    const titleEl = document.querySelector('.form-title-btn');
-    if (titleEl) titleEl.textContent = pasien.kategori === 'ibu' ? 'FORMULIR UNTUK IBU HAMIL' : 'FORMULIR UNTUK BALITA';
-  });
-</script>
+    const p = JSON.parse(raw);
+    const isIbu = p.kategori === 'ibu';
+    const isBalita = p.kategori === 'balita';
+    const katLabel = isIbu ? 'Ibu Hamil' : (isBalita ? 'Balita' : 'Lansia');
 
+    document.getElementById('pasienTable').innerHTML = `
+      <tr>
+        <td>1</td><td>${p.nama||'-'}</td><td>${p.nik||'-'}</td>
+        <td>${p.tglKunjungan||'-'}</td><td>${katLabel}</td>
+      </tr>`;
+
+    document.getElementById('panelTitle').textContent = isIbu
+      ? 'PENGUKURAN – IBU HAMIL'
+      : (isBalita ? 'PENGUKURAN – BALITA' : 'PENGUKURAN – LANSIA');
+
+    const saved = JSON.parse(localStorage.getItem('langkah2Data') || '{}');
+    const today = new Date().toISOString().split('T')[0];
+
+    let fields = `
+      <div class="form-group" style="grid-column:span 2">
+        <label class="form-label">Tanggal Pemeriksaan</label>
+        <input class="form-input" id="tgl_periksa" type="date" value="${saved.tgl_periksa || today}" />
+      </div>
+    `;
+
+    if (isIbu) {
+      fields += `
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Usia Kehamilan (minggu)</label>
+            <input class="form-input" id="usiaHamil" type="number" min="1" max="42" value="${saved.usiaHamil||p.usiaHamil||''}" placeholder="cth: 28"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Berat Badan (kg)</label>
+            <input class="form-input" id="beratBadan" type="number" step="0.1" value="${saved.beratBadan||''}" placeholder="cth: 58.5"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tinggi Badan (cm)</label>
+            <input class="form-input" id="tinggiBadan" type="number" value="${saved.tinggiBadan||''}" placeholder="cth: 160"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Lingkar Lengan Atas / LILA (cm)</label>
+            <input class="form-input" id="lila" type="number" step="0.1" value="${saved.lila||''}" placeholder="cth: 24"/>
+          </div>
+          <div class="form-group" style="grid-column:span 2">
+            <label class="form-label">Tekanan Darah (Sistole/Diastole mmHg)</label>
+            <input class="form-input" id="tekananDarah" type="text" value="${saved.tekananDarah||''}" placeholder="cth: 120/80"/>
+          </div>
+          <div class="form-group" style="grid-column:span 2">
+            <label class="form-label">Kadar Hemoglobin / Hb (g/dL)</label>
+            <input class="form-input" id="hb" type="number" step="0.1" value="${saved.hb||''}" placeholder="cth: 11.5"/>
+          </div>
+        </div>`;
+    } else if (isBalita) {
+      fields += `
+        <div class="section-label">Pengukuran Fisik Balita</div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Berat Badan (kg)</label>
+            <input class="form-input" id="beratBadan" type="number" step="0.1" value="${saved.beratBadan||''}" placeholder="cth: 10.5"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tinggi/Panjang Badan (cm)</label>
+            <input class="form-input" id="tinggiBadan" type="number" step="0.1" value="${saved.tinggiBadan||''}" placeholder="cth: 85"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Lingkar Kepala (cm)</label>
+            <input class="form-input" id="lingkarKepala" type="number" step="0.1" value="${saved.lingkarKepala||''}" placeholder="cth: 44"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Usia Balita (bulan)</label>
+            <input class="form-input" id="usiaBalita" type="number" value="${saved.usiaBalita||''}" placeholder="cth: 18"/>
+          </div>
+          <div class="form-group" style="grid-column:span 2">
+            <label class="form-label">Status Imunisasi</label>
+            <select class="form-input" id="imunisasi">
+              <option value="">-- Pilih Status --</option>
+              <option value="lengkap" ${saved.imunisasi==='lengkap'?'selected':''}>Lengkap</option>
+              <option value="belum_lengkap" ${saved.imunisasi==='belum_lengkap'?'selected':''}>Belum Lengkap</option>
+              <option value="tidak_ada" ${saved.imunisasi==='tidak_ada'?'selected':''}>Tidak Ada Data</option>
+            </select>
+          </div>
+        </div>`;
+    }
+    document.getElementById('formFields').innerHTML = fields;
+  });
+
+  function goBack() { window.location.href = '/langkah-1'; }
+
+  function simpanDanLanjut() {
+    const data = {};
+    document.querySelectorAll('.form-input').forEach(el => {
+      if (el.id) data[el.id] = el.value;
+    });
+    
+    if (!data.tgl_periksa) {
+      alert('Tanggal pemeriksaan wajib diisi');
+      return;
+    }
+
+    localStorage.setItem('langkah2Data', JSON.stringify(data));
+    window.location.href = '/langkah-3';
+  }
+</script>
 </body>
 </html>

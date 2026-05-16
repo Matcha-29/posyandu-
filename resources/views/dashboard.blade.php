@@ -84,7 +84,7 @@
             </svg>
             Dashboard
         </a>
-        <a class="nav-item" href="/data_pasien">
+        <a class="nav-item" href="/list_data_pasien">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0">
                 <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
                 <circle cx="9" cy="7" r="4"/>
@@ -102,14 +102,17 @@
     </nav>
 
     <div class="nav-logout mt-auto w-full px-4 pb-2">
-        <a class="nav-item !text-white/50 hover:!text-red-400 hover:!bg-red-400/10" href="/login">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0">
-                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
-                <polyline points="16 17 21 12 16 7"/>
-                <line x1="21" y1="12" x2="9" y2="12"/>
-            </svg>
-            Logout
-        </a>
+        <form action="{{ route('logout') }}" method="POST">
+            @csrf
+            <button type="submit" class="nav-item w-full !text-white/50 hover:!text-red-400 hover:!bg-red-400/10 border-none bg-transparent text-left">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0">
+                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                Logout
+            </button>
+        </form>
     </div>
 </aside>
 
@@ -140,7 +143,7 @@
             </div>
             <div class="stat-info">
                 <div class="stat-label text-[12px] text-pos-gray-500 font-semibold uppercase tracking-wider">Total Pasien Hari ini</div>
-                <div class="stat-value text-[28px] font-extrabold text-pos-gray-900 leading-tight mt-[2px]">1.459</div>
+                <div class="stat-value text-[28px] font-extrabold text-pos-gray-900 leading-tight mt-[2px]">{{ number_format($totalPasien) }}</div>
             </div>
         </div>
 
@@ -155,7 +158,7 @@
             </div>
             <div class="stat-info">
                 <div class="stat-label text-[12px] text-pos-gray-500 font-semibold uppercase tracking-wider">Balita</div>
-                <div class="stat-value text-[28px] font-extrabold text-pos-gray-900 leading-tight mt-[2px]">5.985</div>
+                <div class="stat-value text-[28px] font-extrabold text-pos-gray-900 leading-tight mt-[2px]">{{ number_format($totalBalita) }}</div>
             </div>
         </div>
 
@@ -169,7 +172,7 @@
             </div>
             <div class="stat-info">
                 <div class="stat-label text-[12px] text-pos-gray-500 font-semibold uppercase tracking-wider">Ibu Hamil</div>
-                <div class="stat-value text-[28px] font-extrabold text-pos-gray-900 leading-tight mt-[2px]">253</div>
+                <div class="stat-value text-[28px] font-extrabold text-pos-gray-900 leading-tight mt-[2px]">{{ number_format($totalIbu) }}</div>
             </div>
         </div>
     </div>
@@ -191,11 +194,11 @@
             <div class="donut-legend flex gap-5 justify-center flex-wrap">
                 <div class="legend-item flex items-center gap-[6px] text-xs font-semibold text-pos-gray-700">
                     <div class="legend-dot w-[10px] h-[10px] rounded-full shrink-0 bg-[#1a5c38]"></div>
-                    Balita 39%
+                    Balita {{ $totalPasien > 0 ? round(($totalBalita / $totalPasien) * 100) : 0 }}%
                 </div>
                 <div class="legend-item flex items-center gap-[6px] text-xs font-semibold text-pos-gray-700">
                     <div class="legend-dot w-[10px] h-[10px] rounded-full shrink-0 bg-[#d1d5db]"></div>
-                    Ibu Hamil 61%
+                    Ibu Hamil {{ $totalPasien > 0 ? round(($totalIbu / $totalPasien) * 100) : 0 }}%
                 </div>
             </div>
         </div>
@@ -205,7 +208,7 @@
     <div class="table-card bg-white rounded-pos-radius shadow-pos-shadow border border-pos-gray-100 overflow-hidden animate-fade-up [animation-delay:0.3s]">
         <div class="table-header flex items-center justify-between px-6 py-5 border-b border-pos-gray-100">
             <span class="table-header-title text-base font-bold text-pos-gray-900">Latest Pasien</span>
-            <a class="view-all text-[13px] font-semibold text-pos-teal no-underline hover:underline" href="#">View all</a>
+            <a class="view-all text-[13px] font-semibold text-pos-teal no-underline hover:underline" href="/list_data_pasien">View all</a>
         </div>
         <table class="w-full border-collapse">
             <thead>
@@ -218,41 +221,19 @@
                 </tr>
             </thead>
             <tbody>
+                @foreach($latestPatients as $index => $p)
                 <tr class="border-b border-pos-gray-100 last:border-none transition-colors hover:bg-pos-gray-50">
-                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium">1</td>
-                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium">Haya Haya</td>
-                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium">34506054933</td>
-                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium"><span class="badge bg-[#e4f7f5] text-pos-teal">Ibu Hamil</span></td>
-                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium">April 15, 2025</td>
+                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium">{{ $index + 1 }}</td>
+                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium">{{ $p->nama }}</td>
+                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium">{{ $p->nik }}</td>
+                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium">
+                        <span class="badge {{ $p->kategori === 'ibu' ? 'bg-[#e4f7f5] text-pos-teal' : 'bg-pos-green-pale text-pos-green-dark' }}">
+                            {{ $p->kategori === 'ibu' ? 'Ibu Hamil' : 'Balita' }}
+                        </span>
+                    </td>
+                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium">{{ $p->created_at->format('M d, Y') }}</td>
                 </tr>
-                <tr class="border-b border-pos-gray-100 last:border-none transition-colors hover:bg-pos-gray-50">
-                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium">2</td>
-                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium">Haya Haya</td>
-                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium">34506054933</td>
-                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium"><span class="badge bg-[#e4f7f5] text-pos-teal">Ibu Hamil</span></td>
-                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium">April 15, 2025</td>
-                </tr>
-                <tr class="border-b border-pos-gray-100 last:border-none transition-colors hover:bg-pos-gray-50">
-                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium">3</td>
-                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium">Haya Haya</td>
-                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium">34506054933</td>
-                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium"><span class="badge bg-pos-green-pale text-pos-green-dark">Balita</span></td>
-                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium">April 15, 2025</td>
-                </tr>
-                <tr class="border-b border-pos-gray-100 last:border-none transition-colors hover:bg-pos-gray-50">
-                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium">4</td>
-                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium">Siti Rahma</td>
-                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium">35120198456</td>
-                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium"><span class="badge bg-[#e4f7f5] text-pos-teal">Ibu Hamil</span></td>
-                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium">April 16, 2025</td>
-                </tr>
-                <tr class="border-b border-pos-gray-100 last:border-none transition-colors hover:bg-pos-gray-50">
-                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium">5</td>
-                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium">Dewi Kusuma</td>
-                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium">35780234512</td>
-                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium"><span class="badge bg-pos-green-pale text-pos-green-dark">Balita</span></td>
-                    <td class="px-5 py-[14px] text-sm text-pos-gray-700 font-medium">April 16, 2025</td>
-                </tr>
+                @endforeach
             </tbody>
         </table>
     </div>
