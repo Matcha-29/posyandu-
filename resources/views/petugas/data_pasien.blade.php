@@ -1338,6 +1338,302 @@
             }
         }
 
+        let activePatientDetail = null;
+        let activePemeriksaanIndex = 0;
+
+        function renderPatientDetails() {
+            const detail = activePatientDetail;
+            const hIdx = activePemeriksaanIndex;
+            const body = document.getElementById('dpBody');
+            
+            if (!detail) return;
+            
+            // 1. Logo POSYANDU di bagian atas
+            let logoHtml = `
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 8px; padding-bottom: 16px; margin-bottom: 4px;">
+                    <img src="/image/logo.png" style="width: 64px; height: 64px; object-fit: contain;" alt="Logo POSYANDU" />
+                    <h2 style="color: var(--green-mid); font-size: 20px; font-weight: 800; tracking-key: 0.05em; margin-top: 10px; margin-bottom: 0;">POSYANDU</h2>
+                    <p style="font-size: 10px; color: var(--gray-500); font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; font-style: italic; margin-top: 2px; margin-bottom: 0;">Dekat Balita, Dekat Ibu, Dekat Kita</p>
+                </div>
+            `;
+            
+            // 2. Informasi Dasar
+            let infoDasarHtml = `
+                <div style="background: #white; border-radius: var(--radius); padding: 16px; border: 1px solid var(--gray-100); box-shadow: var(--shadow); margin-bottom: 12px;">
+                    <p style="font-size: 11px; font-weight: 800; color: var(--gray-900); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.05em; text-align: left;">Informasi Dasar</p>
+                    
+                    <div style="margin-bottom: 14px; text-align: left;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 10px; font-weight: 800; color: var(--gray-900); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">
+                            <i class="ti ti-woman" style="font-size: 13px; color: var(--teal);"></i>
+                            <span>${detail.kategori === 'ibu' ? 'Nama Ibu' : 'Nama Balita'}</span>
+                        </label>
+                        <div style="width: 100%; padding: 10px 14px; border: 1px solid var(--gray-100); border-radius: 8px; font-size: 13px; font-weight: 700; color: var(--gray-900); background: var(--gray-50);">
+                            ${detail.nama}
+                        </div>
+                    </div>
+
+                    <div style="text-align: left;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 10px; font-weight: 800; color: var(--gray-900); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">
+                            <i class="ti ti-world" style="font-size: 13px; color: var(--teal);"></i>
+                            <span>Anak ke</span>
+                        </label>
+                        <div style="width: 100%; padding: 10px 14px; border: 1px solid var(--gray-100); border-radius: 8px; font-size: 13px; font-weight: 700; color: var(--gray-900); background: var(--gray-50);">
+                            ${detail.anakKe || '1'}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // 3. Render 4 Langkah Accordion
+            let stepsHtml = '';
+            const hasCheckups = detail.pemeriksaans && detail.pemeriksaans.length > 0;
+            const h = hasCheckups ? detail.pemeriksaans[hIdx] : null;
+            
+            let step1Content = '';
+            let step2Content = '';
+            let step3Content = '';
+            let step4Content = '';
+            
+            if (hasCheckups && h) {
+                // Langkah 1: Pengukuran Utama
+                step1Content = `
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding-top: 8px; padding-bottom: 4px; text-align: left;">
+                        <div style="background: var(--gray-50); border: 1px solid var(--gray-100); border-radius: 8px; padding: 10px;">
+                            <span style="display: block; font-size: 9px; font-weight: 800; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">${detail.kategori === 'ibu' ? 'Usia Kehamilan' : 'Usia Balita'}</span>
+                            <span style="font-size: 12px; font-weight: 800; color: var(--gray-900);">${detail.kategori === 'ibu' ? (h.usia_hamil || '-') + ' minggu' : (h.usia_balita || '-') + ' bulan'}</span>
+                        </div>
+                        <div style="background: var(--gray-50); border: 1px solid var(--gray-100); border-radius: 8px; padding: 10px;">
+                            <span style="display: block; font-size: 9px; font-weight: 800; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Berat Badan</span>
+                            <span style="font-size: 12px; font-weight: 800; color: var(--gray-900);">${h.berat_badan || '-'} kg</span>
+                        </div>
+                        <div style="background: var(--gray-50); border: 1px solid var(--gray-100); border-radius: 8px; padding: 10px; grid-column: span 2;">
+                            <span style="display: block; font-size: 9px; font-weight: 800; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Tinggi Badan</span>
+                            <span style="font-size: 12px; font-weight: 800; color: var(--gray-900);">${h.tinggi_badan || '-'} cm</span>
+                        </div>
+                    </div>
+                `;
+                
+                // Langkah 2: Pengukuran Tambahan
+                if (detail.kategori === 'ibu') {
+                    step2Content = `
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding-top: 8px; padding-bottom: 4px; text-align: left;">
+                            <div style="background: var(--gray-50); border: 1px solid var(--gray-100); border-radius: 8px; padding: 10px;">
+                                <span style="display: block; font-size: 9px; font-weight: 800; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">LILA</span>
+                                <span style="font-size: 12px; font-weight: 800; color: var(--gray-900);">${h.lila || '-'} cm</span>
+                            </div>
+                            <div style="background: var(--gray-50); border: 1px solid var(--gray-100); border-radius: 8px; padding: 10px;">
+                                <span style="display: block; font-size: 9px; font-weight: 800; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Kadar Hb</span>
+                                <span style="font-size: 12px; font-weight: 800; color: var(--gray-900);">${h.hb || '-'} g/dL</span>
+                            </div>
+                            <div style="background: var(--gray-50); border: 1px solid var(--gray-100); border-radius: 8px; padding: 10px; grid-column: span 2;">
+                                <span style="display: block; font-size: 9px; font-weight: 800; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Tekanan Darah</span>
+                                <span style="font-size: 12px; font-weight: 800; color: var(--gray-900);">${h.tekanan_darah || '-'} mmHg</span>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    step2Content = `
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding-top: 8px; padding-bottom: 4px; text-align: left;">
+                            <div style="background: var(--gray-50); border: 1px solid var(--gray-100); border-radius: 8px; padding: 10px; grid-column: span 2;">
+                                <span style="display: block; font-size: 9px; font-weight: 800; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Lingkar Kepala</span>
+                                <span style="font-size: 12px; font-weight: 800; color: var(--gray-900);">${h.lingkar_kepala || '-'} cm</span>
+                            </div>
+                            <div style="background: var(--gray-50); border: 1px solid var(--gray-100); border-radius: 8px; padding: 10px; grid-column: span 2;">
+                                <span style="display: block; font-size: 9px; font-weight: 800; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Status Imunisasi</span>
+                                <span style="font-size: 12px; font-weight: 800; color: var(--gray-900); text-transform: uppercase;">${h.imunisasi ? h.imunisasi.replace('_', ' ') : '-'}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Langkah 3: Kuesioner Skrining
+                const qTexts = {
+                    q1: 'Mengalami perdarahan dari jalan lahir?',
+                    q2: 'Gerakan janin berkurang / tidak terasa?',
+                    q3: 'Sakit kepala hebat + pandangan kabur?',
+                    q4: 'Bengkak mendadak pada wajah/tangan/kaki?',
+                    q5: 'Mengalami kejang atau pingsan?',
+                    q6: 'Mengalami nyeri perut hebat?',
+                    q7: 'Mengalami demam tinggi?',
+                    q8: 'Tidak bisa makan/minum sama sekali?',
+                    q9: 'Berat badan tidak naik atau turun?',
+                    q10: 'Terlihat pucat dan sangat lemas?',
+                    s1: 'Tinggi badan lebih pendek dari seusianya?',
+                    s2: 'Berat badan tidak naik 2-3 bulan terakhir?',
+                    s3: 'Sering sakit berulang (batuk / diare)?',
+                    s4: 'Tidak mendapat ASI eksklusif?',
+                    s5: 'Jarang makan makanan bergizi (protein)?',
+                    s6: 'Sulit makan / tidak nafsu makan?',
+                    p1: 'Mengalami demam tinggi terus-menerus?',
+                    p2: 'Mengalami diare lebih dari 3 hari?',
+                    p3: 'Mengalami sesak napas / napas cepat?',
+                    p4: 'Tidak mau makan / minum sama sekali?',
+                    p5: 'Lemas / tidak aktif?',
+                    p6: 'Sulit dibangunkan atau tidak responsif?'
+                };
+                
+                let qHtml = '<div style="display: flex; flex-direction: column; gap: 8px; padding-top: 8px; padding-bottom: 4px; text-align: left;">';
+                if (h.jawaban_skrining && Object.keys(h.jawaban_skrining).length > 0) {
+                    Object.entries(h.jawaban_skrining).forEach(([key, val]) => {
+                        const qText = qTexts[key] || key;
+                        const isYa = val === 'ya';
+                        qHtml += `
+                            <div style="display: flex; align-items: start; justify-content: space-between; gap: 12px; font-size: 11px; border-bottom: 1px solid var(--gray-50); padding-bottom: 8px; margin-bottom: 8px;">
+                                <span style="color: var(--gray-900); font-weight: 600; line-height: 1.5;">${qText}</span>
+                                <span style="padding: 2px 6px; border-radius: 4px; font-size: 8px; font-weight: 800; text-transform: uppercase; flex-shrink: 0; background: ${isYa ? '#fee2e2' : '#e8f5ee'}; color: ${isYa ? '#ef4444' : '#1a5c38'};">${val.toUpperCase()}</span>
+                            </div>
+                        `;
+                    });
+                } else {
+                    qHtml += '<p style="font-size: 11px; color: var(--gray-500); font-style: italic;">Tidak ada data kuesioner</p>';
+                }
+                qHtml += '</div>';
+                step3Content = qHtml;
+                
+                // Langkah 4: Hasil & Tindak Lanjut
+                step4Content = `
+                    <div style="display: flex; flex-direction: column; gap: 10px; padding-top: 8px; padding-bottom: 4px; text-align: left;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: var(--gray-50); border: 1px solid var(--gray-100); border-radius: 8px; padding: 10px;">
+                            <span style="font-size: 10px; font-weight: 800; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.05em;">Level Risiko</span>
+                            <span style="padding: 2px 8px; border-radius: 4px; font-size: 8.5px; font-weight: 800; text-transform: uppercase; background: ${h.level_risiko === 'rendah' ? '#e8f5ee' : (h.level_risiko === 'darurat' ? '#ef4444' : '#fff3cd')}; color: ${h.level_risiko === 'rendah' ? '#1a5c38' : (h.level_risiko === 'darurat' ? '#ffffff' : '#856404')};">
+                                ${h.level_risiko || '-'}
+                            </span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: var(--gray-50); border: 1px solid var(--gray-100); border-radius: 8px; padding: 10px;">
+                            <span style="font-size: 10px; font-weight: 800; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.05em;">Skor YA</span>
+                            <span style="font-size: 12px; font-weight: 800; color: var(--gray-900);">${h.skor_ya || 0} Jawaban YA</span>
+                        </div>
+                        <div style="background: var(--gray-50); border: 1px solid var(--gray-100); border-radius: 8px; padding: 10px;">
+                            <span style="display: block; font-size: 9px; font-weight: 800; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Tindak Lanjut</span>
+                            <div style="display: flex; flex-direction: column; gap: 6px;">
+                                ${h.tindak_lanjut && h.tindak_lanjut.length > 0 
+                                    ? h.tindak_lanjut.map(tl => `
+                                        <div style="display: flex; align-items: start; gap: 6px; font-size: 11px; color: var(--gray-900);">
+                                            <i class="ti ti-circle-check" style="color: var(--teal); font-size: 14px; flex-shrink: 0; margin-top: 2px;"></i>
+                                            <span>${tl}</span>
+                                        </div>
+                                    `).join('')
+                                    : '<p style="font-size: 11px; color: var(--gray-500); font-style: italic;">Tidak ada tindak lanjut</p>'
+                                }
+                            </div>
+                        </div>
+                        ${h.catatan ? `
+                            <div style="background: var(--gray-50); border: 1px solid var(--gray-100); border-radius: 8px; padding: 10px;">
+                                <span style="display: block; font-size: 9px; font-weight: 800; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Catatan Petugas</span>
+                                <p style="font-size: 11px; color: var(--gray-900); line-height: 1.5; margin: 0;">${h.catatan}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            } else {
+                const noData = '<p style="font-size: 12px; color: var(--gray-500); font-style: italic; padding: 12px; text-align: center; margin: 0;">Belum ada rekam medis</p>';
+                step1Content = noData;
+                step2Content = noData;
+                step3Content = noData;
+                step4Content = noData;
+            }
+            
+            const steps = [
+                { num: 1, title: 'Langkah 1 (Pengukuran Utama)', content: step1Content },
+                { num: 2, title: 'Langkah 2 (Pengukuran Tambahan)', content: step2Content },
+                { num: 3, title: 'Langkah 3 (Kuesioner Skrining)', content: step3Content },
+                { num: 4, title: 'Langkah 4 (Hasil & Tindak Lanjut)', content: step4Content }
+            ];
+            
+            steps.forEach(step => {
+                stepsHtml += `
+                    <div style="background: #fff; border: 1px solid var(--gray-100); border-radius: var(--radius); overflow: hidden; margin-bottom: 10px; box-shadow: var(--shadow);">
+                        <button style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 14px; background: none; border: none; cursor: pointer; text-align: left;" onclick="toggleDetailStep(${step.num})">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <i class="ti ti-file-text" style="font-size: 18px; color: var(--teal);"></i>
+                                <span style="font-size: 13px; font-weight: 700; color: var(--gray-900);">${step.title}</span>
+                            </div>
+                            <i class="ti ti-chevron-down" style="font-size: 15px; color: var(--gray-500); transition: transform 0.2s;" id="step-arrow-${step.num}"></i>
+                        </button>
+                        <div style="padding: 14px; border-top: 1px solid var(--gray-50); display: none;" id="step-content-${step.num}">
+                            ${step.content}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // 4. Riwayat Pemeriksaan
+            let riwayatRowsHtml = '';
+            if (hasCheckups) {
+                detail.pemeriksaans.forEach((pemeriksaan, pIdx) => {
+                    const isSelected = pIdx === hIdx;
+                    const dateFormatted = new Date(pemeriksaan.tgl_periksa).toLocaleDateString('id-ID', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric'
+                    });
+                    
+                    riwayatRowsHtml += `
+                        <div style="display: flex; gap: 12px; align-items: flex-end; margin-bottom: 14px; text-align: left;">
+                            <div style="flex: 1;">
+                                <label style="display: flex; align-items: center; gap: 6px; font-size: 9px; font-weight: 800; color: var(--gray-500); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em;">
+                                    <i class="ti ti-calendar" style="font-size: 12px; color: var(--teal);"></i>
+                                    <span>Tanggal Riwayat Pemeriksaan</span>
+                                </label>
+                                <div style="width: 100%; padding: 10px; border: 1px solid var(--gray-100); border-radius: 8px; background: var(--gray-50); font-size: 12px; font-weight: 800; color: var(--gray-900); display: flex; align-items: center; gap: 8px;">
+                                    <span>${dateFormatted}</span>
+                                </div>
+                            </div>
+                            <div style="flex: 1;">
+                                <label style="display: flex; align-items: center; gap: 6px; font-size: 9px; font-weight: 800; color: var(--gray-500); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em;">
+                                    <i class="ti ti-pointer" style="font-size: 12px; color: var(--teal);"></i>
+                                    <span>Aksi</span>
+                                </label>
+                                <button onclick="selectPemeriksaan(${pIdx})" style="width: 100%; padding: 10px; border: 1px solid ${isSelected ? 'var(--teal)' : 'var(--gray-100)'}; background: ${isSelected ? 'var(--teal)' : '#fff'}; color: ${isSelected ? '#fff' : 'var(--gray-900)'}; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px; box-shadow: var(--shadow);">
+                                    <span>Lihat Detail Riwayat</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                riwayatRowsHtml = '<p style="font-size: 12px; color: var(--gray-500); font-style: italic; padding: 8px 0; text-align: center; margin: 0;">Belum ada riwayat pemeriksaan.</p>';
+            }
+            
+            let riwayatCardHtml = `
+                <div style="background: #fff; border-radius: var(--radius); padding: 16px; border: 1px solid var(--gray-100); box-shadow: var(--shadow); margin-top: 6px;">
+                    <p style="font-size: 11px; font-weight: 800; color: var(--gray-900); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.05em; text-align: left;">Riwayat Pemeriksaan</p>
+                    <div style="display: flex; flex-direction: column;">
+                        ${riwayatRowsHtml}
+                    </div>
+                </div>
+            `;
+            
+            body.innerHTML = logoHtml + infoDasarHtml + stepsHtml + riwayatCardHtml;
+        }
+
+        window.toggleDetailStep = function(stepNum) {
+            const content = document.getElementById(`step-content-${stepNum}`);
+            const arrow = document.getElementById(`step-arrow-${stepNum}`);
+            if (!content || !arrow) return;
+            const isHidden = content.style.display === 'none' || content.style.display === '';
+            
+            for (let i = 1; i <= 4; i++) {
+                const c = document.getElementById(`step-content-${i}`);
+                const a = document.getElementById(`step-arrow-${i}`);
+                if (c && a) {
+                    c.style.display = 'none';
+                    a.classList.remove('rotate-180');
+                }
+            }
+            
+            if (isHidden) {
+                content.style.display = 'block';
+                arrow.classList.add('rotate-180');
+            }
+        };
+
+        window.selectPemeriksaan = function(idx) {
+            activePemeriksaanIndex = idx;
+            renderPatientDetails();
+            window.toggleDetailStep(1);
+        };
+
         async function lihat(id) {
             const p = data.find(x => x.id === id);
             if(!p) return;
@@ -1356,100 +1652,9 @@
                 });
                 const detail = await response.json();
 
-                const historyHtml = detail.pemeriksaans.length > 0 
-                    ? detail.pemeriksaans.map((h, hIdx) => {
-                        const accId = `acc-${h.id}`;
-                        const isOpen = hIdx === 0;
-                        
-                        const tindakLanjutHtml = h.tindak_lanjut ? h.tindak_lanjut.map(tl => `
-                            <div style="display: flex; align-items: start; gap: 8px; font-size: 12px; color: var(--gray-700); padding: 2px 0;">
-                                <i class="ti ti-circle-check" style="color: #1e9e8c; font-size: 14px;"></i>
-                                <span>${tl}</span>
-                            </div>
-                        `).join('') : '<p style="font-size: 12px; color: var(--gray-500); font-style: italic;">Tidak ada tindak lanjut</p>';
-
-                        return `
-                        <div style="background: #fff; border: 1px solid var(--gray-100); border-radius: 8px; overflow: hidden; margin-bottom: 12px;" id="${accId}">
-                            <button style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left;" onclick="toggleAcc('${accId}')">
-                                <span style="font-size: 13px; font-weight: 700; color: var(--gray-900);">${new Date(h.tgl_periksa).toLocaleDateString('id-ID')}</span>
-                                <span style="padding: 2px 8px; border-radius: 4px; font-size: 9px; font-weight: 700; text-transform: uppercase; background: ${h.level_risiko === 'rendah' ? '#e8f5ee' : '#fee2e2'}; color: ${h.level_risiko === 'rendah' ? '#1a5c38' : '#ef4444'};">${h.level_risiko}</span>
-                                <i class="ti ti-chevron-down ${isOpen ? 'rotate-180' : ''}" style="font-size: 14px; color: var(--gray-500);"></i>
-                            </button>
-                            <div style="padding: 16px; border-top: 1px solid var(--gray-100); display: ${isOpen ? 'block' : 'none'};">
-                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
-                                    <div>
-                                        <span style="font-size: 10px; font-weight: 700; color: var(--gray-500); text-transform: uppercase;">Berat Badan</span>
-                                        <span style="display: block; font-size: 13px; font-weight: 700; color: var(--gray-900);">${h.berat_badan || '-'} kg</span>
-                                    </div>
-                                    <div>
-                                        <span style="font-size: 10px; font-weight: 700; color: var(--gray-500); text-transform: uppercase;">Tinggi Badan</span>
-                                        <span style="display: block; font-size: 13px; font-weight: 700; color: var(--gray-900);">${h.tinggi_badan || '-'} cm</span>
-                                    </div>
-                                    <div>
-                                        <span style="font-size: 10px; font-weight: 700; color: var(--gray-500); text-transform: uppercase;">Tekanan Darah</span>
-                                        <span style="display: block; font-size: 13px; font-weight: 700; color: var(--gray-900);">${h.tekanan_darah || '-'}</span>
-                                    </div>
-                                    <div>
-                                        <span style="font-size: 10px; font-weight: 700; color: var(--gray-500); text-transform: uppercase;">Level Risiko</span>
-                                        <span style="display: block; font-size: 13px; font-weight: 700; color: ${h.level_risiko === 'rendah' ? '#1a5c38' : '#ef4444'}; text-transform: uppercase;">${h.level_risiko}</span>
-                                    </div>
-                                </div>
-                                <div style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--gray-100);">
-                                    <span style="font-size: 10px; font-weight: 700; color: var(--gray-900); text-transform: uppercase; display: block; margin-bottom: 6px;">Tindak Lanjut</span>
-                                    ${tindakLanjutHtml}
-                                </div>
-                            </div>
-                        </div>`;
-                    }).join('')
-                    : '<div style="background: #fff; border: 1px solid var(--gray-100); border-radius: 8px; padding: 24px; text-align: center;"><i class="ti ti-notes-off" style="font-size: 24px; opacity: 0.3; display: block; margin-bottom: 8px;"></i><p style="font-size: 12px; color: var(--gray-500);">Belum ada riwayat skrining.</p></div>';
-
-                body.innerHTML = `
-                    <div style="background: #fff; border-radius: 12px; padding: 20px; border: 1px solid var(--gray-100); margin-bottom: 16px; box-shadow: var(--shadow);">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--gray-100);">
-                            <div style="width: 48px; height: 48px; border-radius: 50%; background: #e4f7f5; display: flex; align-items: center; justify-content: center; color: #1e9e8c;">
-                                <i class="ti ti-user" style="font-size: 24px;"></i>
-                            </div>
-                            <div>
-                                <h3 style="font-size: 16px; font-weight: 800; color: var(--gray-900); margin: 0;">${detail.nama}</h3>
-                                <p style="font-size: 10px; font-weight: 700; color: var(--gray-500); margin: 4px 0 0 0; letter-spacing: 0.5px;">${detail.nik}</p>
-                            </div>
-                        </div>
-                        <div style="display: flex; flex-direction: column; gap: 12px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <div style="display: flex; align-items: center; gap: 6px; color: var(--gray-500); font-size: 12px;">
-                                    <i class="ti ti-map-pin"></i>
-                                    <span>Wilayah</span>
-                                </div>
-                                <span style="font-size: 12px; font-weight: 700; color: var(--gray-900);">${detail.kecamatan || '-'}</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <div style="display: flex; align-items: center; gap: 6px; color: var(--gray-500); font-size: 12px;">
-                                    <i class="ti ti-phone"></i>
-                                    <span>Kontak</span>
-                                </div>
-                                <span style="font-size: 12px; font-weight: 700; color: var(--gray-900);">${detail.noHp || '-'}</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <div style="display: flex; align-items: center; gap: 6px; color: var(--gray-500); font-size: 12px;">
-                                    <i class="ti ti-category"></i>
-                                    <span>Kategori</span>
-                                </div>
-                                <span style="padding: 2px 8px; border-radius: 4px; font-size: 9px; font-weight: 700; text-transform: uppercase; background: ${detail.kategori === 'ibu' ? '#e4f7f5' : '#e8f5ee'}; color: ${detail.kategori === 'ibu' ? '#1e9e8c' : '#1a5c38'};">${detail.kategori === 'ibu' ? 'Ibu Hamil' : 'Balita'}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="padding: 4px;">
-                        <h3 style="font-size: 14px; font-weight: 800; color: var(--gray-900); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-                            <i class="ti ti-history" style="color: #1e9e8c;"></i>
-                            Riwayat Pemeriksaan
-                            <span style="background: rgba(30,158,140,0.1); color: #1e9e8c; font-size: 10px; padding: 2px 6px; border-radius: 10px;">${detail.pemeriksaans.length}</span>
-                        </h3>
-                        <div style="display: flex; flex-direction: column;">
-                            ${historyHtml}
-                        </div>
-                    </div>
-                `;
+                activePatientDetail = detail;
+                activePemeriksaanIndex = 0;
+                renderPatientDetails();
             } catch (error) {
                 console.error(error);
                 body.innerHTML = '<div style="padding: 32px; text-align: center; color: #ef4444;"><i class="ti ti-alert-triangle" style="font-size: 24px;"></i><p style="margin-top: 8px; font-weight: 700;">Gagal memuat data</p></div>';
@@ -1489,21 +1694,15 @@
     </script>
     <!-- ══ DETAIL OVERLAY & SIDE-PANEL ══ -->
     <div id="detailOverlay" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 200; backdrop-filter: blur(4px); transition: opacity 0.3s;" onclick="handleOverlayClick(event)">
-        <div id="detailPanel" class="translate-x-full" style="position: fixed; right: 0; top: 0; bottom: 0; width: 460px; background: #f7f9f8; box-shadow: -4px 0 24px rgba(0,0,0,0.15); z-index: 210; transition: transform 0.3s ease; display: flex; flex-direction: column;">
-            <!-- Header -->
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; background: #fff; border-bottom: 1px solid var(--gray-100);">
-                <h2 style="font-size: 16px; font-weight: 800; color: var(--gray-900); display: flex; align-items: center; gap: 8px; margin: 0;">
-                    <i class="ti ti-id-badge-2" style="color: #1e9e8c; font-size: 20px;"></i>
-                    Detail Rekam Medis
-                </h2>
-                <button style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #f3f4f6; border: none; cursor: pointer;" onclick="closeDetailPanel()">
-                    <i class="ti ti-x" style="font-size: 16px; color: var(--gray-700);"></i>
-                </button>
+        <div id="detailPanel" class="translate-x-full" style="position: fixed; right: 0; top: 0; bottom: 0; width: 420px; background: #f7f9f8; box-shadow: -4px 0 24px rgba(0,0,0,0.15); z-index: 210; transition: transform 0.3s ease; display: flex; flex-direction: column;">
+            <!-- Body -->
+            <div style="flex: 1; overflow-y: auto; padding: 20px;" id="dpBody">
+                <!-- Dynamic Content -->
             </div>
             
-            <!-- Body -->
-            <div style="flex: 1; overflow-y: auto; padding: 24px;" id="dpBody">
-                <!-- Dynamic Content -->
+            <!-- Sticky Footer -->
+            <div style="position: sticky; bottom: 0; background: #fff; border-top: 1px solid var(--gray-100); padding: 14px 20px;">
+                <button style="width: 100%; padding: 14px; border: none; background: #1e2a6e; color: #fff; border-radius: 50px; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#162060'" onmouseout="this.style.background='#1e2a6e'" onclick="closeDetailPanel()">Kembali</button>
             </div>
         </div>
     </div>

@@ -12,6 +12,155 @@ use Illuminate\Support\Facades\Route;
 ══════════════════════════════════════════════════ */
 Route::get('/', fn() => redirect('/login'));
 
+/* ── SETUP DATABASE OTOMATIS VIA BROWSER ── */
+Route::get('/setup-db', function () {
+    try {
+        // 0. Bersihkan Cache Laravel agar mendeteksi perubahan .env terbaru
+        \Illuminate\Support\Facades\Artisan::call('config:clear');
+        \Illuminate\Support\Facades\Artisan::call('cache:clear');
+
+        $host = config('database.connections.mysql.host', '127.0.0.1');
+        $port = config('database.connections.mysql.port', '3306');
+        $username = config('database.connections.mysql.username', 'root');
+        $password = config('database.connections.mysql.password', '');
+        $dbName = config('database.connections.mysql.database', 'posyandu_new');
+
+        // 1. Buat Database Baru
+        $pdo = new PDO("mysql:host=$host;port=$port", $username, $password);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbName` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;");
+
+        // 2. Tulis File SQL posyandu_new.sql secara dinamis
+        if (file_exists(base_path('generate_sql_file.php'))) {
+            include base_path('generate_sql_file.php');
+        }
+
+        // 3. Jalankan Migrations & Seeders Laravel
+        \Illuminate\Support\Facades\Artisan::call('migrate:fresh', ['--seed' => true]);
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => "Database '$dbName' berhasil dibuat dan data default berhasil dimasukkan! Silakan login menggunakan admin@posyandu.id (admin123) atau petugas@posyandu.id (petugas123)."
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage()
+        ], 500);
+    }
+});
+
+/* ── DIAGNOSTIK DATABASE VIA BROWSER ── */
+Route::get('/db-check', function () {
+    try {
+        $dbName = \Illuminate\Support\Facades\DB::connection()->getDatabaseName();
+        $dbDriver = \Illuminate\Support\Facades\DB::connection()->getDriverName();
+        $dbHost = config('database.connections.mysql.host');
+        $dbPort = config('database.connections.mysql.port');
+
+        $output = [
+            'status' => 'connected',
+            'database' => [
+                'driver' => $dbDriver,
+                'host' => $dbHost,
+                'port' => $dbPort,
+                'name' => $dbName,
+            ],
+            'users_table' => 'not_found',
+            'users_list' => []
+        ];
+
+        if (\Illuminate\Support\Facades\Schema::hasTable('users')) {
+            $output['users_table'] = 'found';
+            $users = \Illuminate\Support\Facades\DB::table('users')->get(['id', 'name', 'email', 'role', 'is_active']);
+            $output['users_list'] = $users;
+        }
+
+        return response()->json($output);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'failed_to_connect',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+});
+
+/* ── FORCE RESET AKUN ADMIN & PETUGAS ── */
+Route::get('/reset-admin', function () {
+    try {
+        // 0. Bersihkan Cache Laravel secara paksa
+        \Illuminate\Support\Facades\Artisan::call('config:clear');
+        \Illuminate\Support\Facades\Artisan::call('cache:clear');
+
+        // 1. Pastikan tabel users ada
+        if (!\Illuminate\Support\Facades\Schema::hasTable('users')) {
+            \Illuminate\Support\Facades\Artisan::call('migrate');
+        }
+
+        // 2. Hapus akun lama jika ada
+        \Illuminate\Support\Facades\DB::table('users')->whereIn('email', ['admin@posyandu.id', 'petugas@posyandu.id'])->delete();
+
+        // 3. Buat Akun Admin Baru dengan Hash Aktif
+        \Illuminate\Support\Facades\DB::table('users')->insert([
+            'name'      => 'Administrator',
+            'email'     => 'admin@posyandu.id',
+            'role'      => 'admin',
+            'password'  => \Illuminate\Support\Facades\Hash::make('admin123'),
+            'is_active' => true,
+            'created_at'=> now(),
+            'updated_at'=> now(),
+        ]);
+
+        // 4. Buat Akun Petugas Baru dengan Hash Aktif
+        \Illuminate\Support\Facades\DB::table('users')->insert([
+            'name'      => 'Bidan Sari',
+            'email'     => 'petugas@posyandu.id',
+            'role'      => 'petugas',
+            'password'  => \Illuminate\Support\Facades\Hash::make('petugas123'),
+            'is_active' => true,
+            'created_at'=> now(),
+            'updated_at'=> now(),
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Akun Admin & Petugas berhasil di-reset dengan password yang 100% benar!',
+            'accounts' => [
+                ['email' => 'admin@posyandu.id', 'password' => 'admin123', 'role' => 'admin'],
+                ['email' => 'petugas@posyandu.id', 'password' => 'petugas123', 'role' => 'petugas']
+            ]
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage()
+        ], 500);
+    }
+});
+
+/* ── MEMBERSIHKAN FILE PEMBANTU SEMENTARA ── */
+Route::get('/cleanup', function () {
+    $files = [
+        base_path('create_and_seed_db.php'),
+        base_path('generate_sql_file.php'),
+        base_path('db_check.php')
+    ];
+
+    $deleted = [];
+    foreach ($files as $file) {
+        if (file_exists($file)) {
+            @unlink($file);
+            $deleted[] = basename($file);
+        }
+    }
+
+    return response()->json([
+        'status' => 'success',
+        'message' => 'File pembantu sementara berhasil dibersihkan dari proyek!',
+        'deleted_files' => $deleted
+    ]);
+});
+
 Route::get('/login',  [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout',[AuthController::class, 'logout'])->name('logout');

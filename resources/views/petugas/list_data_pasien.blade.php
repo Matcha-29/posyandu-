@@ -322,6 +322,304 @@
             window.location.href = '/langkah-1';
         }
 
+        let activePatientDetail = null;
+        let activePemeriksaanIndex = 0;
+
+        function renderPatientDetails() {
+            const detail = activePatientDetail;
+            const hIdx = activePemeriksaanIndex;
+            const body = document.getElementById('dpBody');
+            
+            if (!detail) return;
+            
+            // 1. Logo POSYANDU di bagian atas
+            let logoHtml = `
+                <div class="flex flex-col items-center justify-center pt-2 pb-4 mb-1">
+                    <img src="/image/logo.png" class="w-16 h-16 object-contain" alt="Logo POSYANDU" />
+                    <h2 class="text-pos-teal text-xl font-extrabold tracking-wider mt-2.5">POSYANDU</h2>
+                    <p class="text-[10px] text-pos-gray-500 font-extrabold tracking-widest uppercase italic mt-0.5">Dekat Balita, Dekat Ibu, Dekat Kita</p>
+                </div>
+            `;
+            
+            // 2. Informasi Dasar
+            let infoDasarHtml = `
+                <div class="bg-white rounded-pos-radius p-4 border border-pos-border shadow-sm mb-3">
+                    <p class="text-[11px] font-extrabold text-pos-navy mb-3.5 uppercase tracking-wider text-left">Informasi Dasar</p>
+                    
+                    <div class="mb-3.5 text-left">
+                        <label class="flex items-center gap-2 text-[10px] font-extrabold text-pos-navy mb-1.5 uppercase tracking-wider">
+                            <i class="ti ti-woman text-[13px] text-pos-teal"></i>
+                            <span>${detail.kategori === 'ibu' ? 'Nama Ibu' : 'Nama Balita'}</span>
+                        </label>
+                        <div class="w-full px-3 py-2.5 border border-pos-border rounded-lg bg-pos-bg text-[13px] font-bold text-pos-navy shadow-inner">
+                            ${detail.nama}
+                        </div>
+                    </div>
+
+                    <div class="text-left">
+                        <label class="flex items-center gap-2 text-[10px] font-extrabold text-pos-navy mb-1.5 uppercase tracking-wider">
+                            <i class="ti ti-world text-[13px] text-pos-teal"></i>
+                            <span>Anak ke</span>
+                        </label>
+                        <div class="w-full px-3 py-2.5 border border-pos-border rounded-lg bg-pos-bg text-[13px] font-bold text-pos-navy shadow-inner">
+                            ${detail.anakKe || '1'}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // 3. Render 4 Langkah Accordion
+            let stepsHtml = '';
+            const hasCheckups = detail.pemeriksaans && detail.pemeriksaans.length > 0;
+            const h = hasCheckups ? detail.pemeriksaans[hIdx] : null;
+            
+            let step1Content = '';
+            let step2Content = '';
+            let step3Content = '';
+            let step4Content = '';
+            
+            if (hasCheckups && h) {
+                // Langkah 1: Pengukuran Utama
+                step1Content = `
+                    <div class="grid grid-cols-2 gap-3 pt-2 pb-1 text-left">
+                        <div class="bg-pos-bg border border-pos-border rounded-lg p-2.5">
+                            <span class="block text-[9px] font-extrabold text-pos-muted uppercase tracking-wider mb-1">${detail.kategori === 'ibu' ? 'Usia Kehamilan' : 'Usia Balita'}</span>
+                            <span class="text-xs font-extrabold text-pos-navy">${detail.kategori === 'ibu' ? (h.usia_hamil || '-') + ' minggu' : (h.usia_balita || '-') + ' bulan'}</span>
+                        </div>
+                        <div class="bg-pos-bg border border-pos-border rounded-lg p-2.5">
+                            <span class="block text-[9px] font-extrabold text-pos-muted uppercase tracking-wider mb-1">Berat Badan</span>
+                            <span class="text-xs font-extrabold text-pos-navy">${h.berat_badan || '-'} kg</span>
+                        </div>
+                        <div class="bg-pos-bg border border-pos-border rounded-lg p-2.5 col-span-2">
+                            <span class="block text-[9px] font-extrabold text-pos-muted uppercase tracking-wider mb-1">Tinggi Badan</span>
+                            <span class="text-xs font-extrabold text-pos-navy">${h.tinggi_badan || '-'} cm</span>
+                        </div>
+                    </div>
+                `;
+                
+                // Langkah 2: Pengukuran Tambahan
+                if (detail.kategori === 'ibu') {
+                    step2Content = `
+                        <div class="grid grid-cols-2 gap-3 pt-2 pb-1 text-left">
+                            <div class="bg-pos-bg border border-pos-border rounded-lg p-2.5">
+                                <span class="block text-[9px] font-extrabold text-pos-muted uppercase tracking-wider mb-1">LILA</span>
+                                <span class="text-xs font-extrabold text-pos-navy">${h.lila || '-'} cm</span>
+                            </div>
+                            <div class="bg-pos-bg border border-pos-border rounded-lg p-2.5">
+                                <span class="block text-[9px] font-extrabold text-pos-muted uppercase tracking-wider mb-1">Kadar Hb</span>
+                                <span class="text-xs font-extrabold text-pos-navy">${h.hb || '-'} g/dL</span>
+                            </div>
+                            <div class="bg-pos-bg border border-pos-border rounded-lg p-2.5 col-span-2">
+                                <span class="block text-[9px] font-extrabold text-pos-muted uppercase tracking-wider mb-1">Tekanan Darah</span>
+                                <span class="text-xs font-extrabold text-pos-navy">${h.tekanan_darah || '-'} mmHg</span>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    step2Content = `
+                        <div class="grid grid-cols-2 gap-3 pt-2 pb-1 text-left">
+                            <div class="bg-pos-bg border border-pos-border rounded-lg p-2.5 col-span-2">
+                                <span class="block text-[9px] font-extrabold text-pos-muted uppercase tracking-wider mb-1">Lingkar Kepala</span>
+                                <span class="text-xs font-extrabold text-pos-navy">${h.lingkar_kepala || '-'} cm</span>
+                            </div>
+                            <div class="bg-pos-bg border border-pos-border rounded-lg p-2.5 col-span-2">
+                                <span class="block text-[9px] font-extrabold text-pos-muted uppercase tracking-wider mb-1">Status Imunisasi</span>
+                                <span class="text-xs font-extrabold text-pos-navy uppercase">${h.imunisasi ? h.imunisasi.replace('_', ' ') : '-'}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Langkah 3: Kuesioner Skrining
+                const qTexts = {
+                    q1: 'Mengalami perdarahan dari jalan lahir?',
+                    q2: 'Gerakan janin berkurang / tidak terasa?',
+                    q3: 'Sakit kepala hebat + pandangan kabur?',
+                    q4: 'Bengkak mendadak pada wajah/tangan/kaki?',
+                    q5: 'Mengalami kejang atau pingsan?',
+                    q6: 'Mengalami nyeri perut hebat?',
+                    q7: 'Mengalami demam tinggi?',
+                    q8: 'Tidak bisa makan/minum sama sekali?',
+                    q9: 'Berat badan tidak naik atau turun?',
+                    q10: 'Terlihat pucat dan sangat lemas?',
+                    s1: 'Tinggi badan lebih pendek dari seusianya?',
+                    s2: 'Berat badan tidak naik 2-3 bulan terakhir?',
+                    s3: 'Sering sakit berulang (batuk / diare)?',
+                    s4: 'Tidak mendapat ASI eksklusif?',
+                    s5: 'Jarang makan makanan bergizi (protein)?',
+                    s6: 'Sulit makan / tidak nafsu makan?',
+                    p1: 'Mengalami demam tinggi terus-menerus?',
+                    p2: 'Mengalami diare lebih dari 3 hari?',
+                    p3: 'Mengalami sesak napas / napas cepat?',
+                    p4: 'Tidak mau makan / minum sama sekali?',
+                    p5: 'Lemas / tidak aktif?',
+                    p6: 'Sulit dibangunkan atau tidak responsif?'
+                };
+                
+                let qHtml = '<div class="flex flex-col gap-2 pt-2 pb-1 text-left">';
+                if (h.jawaban_skrining && Object.keys(h.jawaban_skrining).length > 0) {
+                    Object.entries(h.jawaban_skrining).forEach(([key, val]) => {
+                        const qText = qTexts[key] || key;
+                        const isYa = val === 'ya';
+                        qHtml += `
+                            <div class="flex items-start justify-between gap-3 text-[11px] border-b border-pos-bg pb-2 last:border-b-0">
+                                <span class="text-pos-navy font-semibold leading-relaxed">${qText}</span>
+                                <span class="px-1.5 py-0.5 rounded text-[8px] font-extrabold uppercase shrink-0 ${isYa ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}">${val.toUpperCase()}</span>
+                            </div>
+                        `;
+                    });
+                } else {
+                    qHtml += '<p class="text-[11px] text-pos-muted italic">Tidak ada data kuesioner</p>';
+                }
+                qHtml += '</div>';
+                step3Content = qHtml;
+                
+                // Langkah 4: Hasil & Tindak Lanjut
+                step4Content = `
+                    <div class="flex flex-col gap-2.5 pt-2 pb-1 text-left">
+                        <div class="flex justify-between items-center bg-pos-bg border border-pos-border rounded-lg p-2.5">
+                            <span class="text-[10px] font-extrabold text-pos-muted uppercase tracking-wider">Level Risiko</span>
+                            <span class="px-2 py-0.5 rounded text-[8.5px] font-extrabold uppercase ${h.level_risiko === 'rendah' ? 'bg-green-100 text-green-700' : (h.level_risiko === 'darurat' ? 'bg-red-600 text-white animate-pulse' : 'bg-orange-100 text-orange-700')}">
+                                ${h.level_risiko || '-'}
+                            </span>
+                        </div>
+                        <div class="flex justify-between items-center bg-pos-bg border border-pos-border rounded-lg p-2.5">
+                            <span class="text-[10px] font-extrabold text-pos-muted uppercase tracking-wider">Skor YA</span>
+                            <span class="text-xs font-extrabold text-pos-navy">${h.skor_ya || 0} Jawaban YA</span>
+                        </div>
+                        <div class="bg-pos-bg border border-pos-border rounded-lg p-2.5">
+                            <span class="block text-[9px] font-extrabold text-pos-muted uppercase tracking-wider mb-2">Tindak Lanjut</span>
+                            <div class="flex flex-col gap-1.5">
+                                ${h.tindak_lanjut && h.tindak_lanjut.length > 0 
+                                    ? h.tindak_lanjut.map(tl => `
+                                        <div class="flex items-start gap-1.5 text-[11px] text-pos-navy">
+                                            <i class="ti ti-circle-check text-pos-teal text-sm shrink-0 mt-0.5"></i>
+                                            <span>${tl}</span>
+                                        </div>
+                                    `).join('')
+                                    : '<p class="text-[11px] text-pos-muted italic">Tidak ada tindak lanjut</p>'
+                                }
+                            </div>
+                        </div>
+                        ${h.catatan ? `
+                            <div class="bg-pos-bg border border-pos-border rounded-lg p-2.5">
+                                <span class="block text-[9px] font-extrabold text-pos-muted uppercase tracking-wider mb-1">Catatan Petugas</span>
+                                <p class="text-[11px] text-pos-navy leading-relaxed">${h.catatan}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            } else {
+                const noData = '<p class="text-xs text-pos-muted italic p-3 text-center">Belum ada rekam medis</p>';
+                step1Content = noData;
+                step2Content = noData;
+                step3Content = noData;
+                step4Content = noData;
+            }
+            
+            const steps = [
+                { num: 1, title: 'Langkah 1 (Pengukuran Utama)', content: step1Content },
+                { num: 2, title: 'Langkah 2 (Pengukuran Tambahan)', content: step2Content },
+                { num: 3, title: 'Langkah 3 (Kuesioner Skrining)', content: step3Content },
+                { num: 4, title: 'Langkah 4 (Hasil & Tindak Lanjut)', content: step4Content }
+            ];
+            
+            steps.forEach(step => {
+                stepsHtml += `
+                    <div class="bg-white border border-pos-border rounded-pos-radius overflow-hidden mb-2.5 shadow-sm">
+                        <button class="w-full flex items-center justify-between p-3.5 bg-none border-none cursor-pointer text-left transition-colors hover:bg-pos-bg/50" onclick="toggleDetailStep(${step.num})">
+                            <div class="flex items-center gap-2.5">
+                                <i class="ti ti-file-text text-[18px] text-pos-teal"></i>
+                                <span class="text-[13px] font-bold text-pos-navy">${step.title}</span>
+                            </div>
+                            <i class="ti ti-chevron-down text-[15px] text-pos-muted transition-transform duration-200" id="step-arrow-${step.num}"></i>
+                        </button>
+                        <div class="px-3.5 pb-3.5 border-t border-pos-bg hidden" id="step-content-${step.num}">
+                            ${step.content}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // 4. Riwayat Pemeriksaan
+            let riwayatRowsHtml = '';
+            if (hasCheckups) {
+                detail.pemeriksaans.forEach((pemeriksaan, pIdx) => {
+                    const isSelected = pIdx === hIdx;
+                    const dateFormatted = new Date(pemeriksaan.tgl_periksa).toLocaleDateString('id-ID', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric'
+                    });
+                    
+                    riwayatRowsHtml += `
+                        <div class="flex gap-3 items-end mb-3.5 last:mb-0 text-left">
+                            <div class="flex-1">
+                                <label class="flex items-center gap-1.5 text-[9px] font-extrabold text-pos-muted mb-1 uppercase tracking-wider">
+                                    <i class="ti ti-calendar text-[12px] text-pos-teal"></i>
+                                    <span>Tanggal Riwayat Pemeriksaan</span>
+                                </label>
+                                <div class="w-full px-3 py-2.5 border border-pos-border rounded-lg bg-pos-bg text-[12px] font-extrabold text-pos-navy shadow-inner flex items-center gap-2">
+                                    <span>${dateFormatted}</span>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <label class="flex items-center gap-1.5 text-[9px] font-extrabold text-pos-muted mb-1 uppercase tracking-wider">
+                                    <i class="ti ti-pointer text-[12px] text-pos-teal"></i>
+                                    <span>Aksi</span>
+                                </label>
+                                <button onclick="selectPemeriksaan(${pIdx})" class="w-full px-3 py-2.5 border ${isSelected ? 'border-pos-teal bg-pos-teal text-white' : 'border-pos-border bg-white text-pos-navy'} hover:border-pos-teal hover:bg-pos-teal-light hover:text-pos-teal-dark rounded-lg text-[11px] font-extrabold transition-all duration-200 flex items-center justify-center gap-1 shadow-sm">
+                                    <span>Lihat Detail Riwayat</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                riwayatRowsHtml = '<p class="text-xs text-pos-muted italic py-2 text-center">Belum ada riwayat pemeriksaan.</p>';
+            }
+            
+            let riwayatCardHtml = `
+                <div class="bg-white rounded-pos-radius p-4 border border-pos-border shadow-sm mt-1.5">
+                    <p class="text-[11px] font-extrabold text-pos-navy mb-3.5 uppercase tracking-wider text-left">Riwayat Pemeriksaan</p>
+                    <div class="flex flex-col">
+                        ${riwayatRowsHtml}
+                    </div>
+                </div>
+            `;
+            
+            body.innerHTML = logoHtml + infoDasarHtml + stepsHtml + riwayatCardHtml;
+        }
+
+        window.toggleDetailStep = function(stepNum) {
+            const content = document.getElementById(`step-content-${stepNum}`);
+            const arrow = document.getElementById(`step-arrow-${stepNum}`);
+            if (!content || !arrow) return;
+            const isHidden = content.classList.contains('hidden');
+            
+            // Close all step contents first to make it a true accordion
+            for (let i = 1; i <= 4; i++) {
+                const c = document.getElementById(`step-content-${i}`);
+                const a = document.getElementById(`step-arrow-${i}`);
+                if (c && a) {
+                    c.classList.add('hidden');
+                    a.classList.remove('rotate-180');
+                }
+            }
+            
+            // If it was hidden, open it
+            if (isHidden) {
+                content.classList.remove('hidden');
+                arrow.classList.add('rotate-180');
+            }
+        };
+
+        window.selectPemeriksaan = function(idx) {
+            activePemeriksaanIndex = idx;
+            renderPatientDetails();
+            window.toggleDetailStep(1);
+        };
+
         async function lihat(id) {
             const p = data.find(x => x.id === id);
             if(!p) return;
@@ -340,122 +638,12 @@
                 });
                 const detail = await response.json();
 
-                const historyHtml = detail.pemeriksaans.length > 0 
-                    ? detail.pemeriksaans.map((h, hIdx) => {
-                        const accId = `acc-${h.id}`;
-                        const isOpen = hIdx === 0;
-                        
-                        const tindakLanjutHtml = h.tindak_lanjut ? h.tindak_lanjut.map(tl => `
-                            <div class="flex items-start gap-2 text-[12px] text-pos-muted py-0.5">
-                                <i class="ti ti-circle-check text-pos-teal text-sm mt-0.5"></i>
-                                <span>${tl}</span>
-                            </div>
-                        `).join('') : '<p class="text-[12px] text-pos-muted italic">Tidak ada tindak lanjut</p>';
-
-                        return `
-                        <div class="bg-white border-[0.5px] border-pos-border rounded-pos-radius overflow-hidden mb-3 shadow-sm" id="${accId}">
-                            <button class="w-full flex items-center gap-[10px] p-[14px_16px] bg-none border-none cursor-pointer text-left transition-colors hover:bg-gray-50" onclick="toggleAcc('${accId}')">
-                                <i class="ti ti-calendar-event text-[18px] text-pos-teal"></i>
-                                <span class="grow text-[14px] font-bold text-pos-navy">${new Date(h.tgl_periksa).toLocaleDateString('id-ID')}</span>
-                                <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase ${h.level_risiko === 'rendah' ? 'bg-green-100 text-green-700' : (h.level_risiko === 'darurat' ? 'bg-red-600 text-white animate-pulse' : 'bg-red-100 text-red-700')}">${h.level_risiko}</span>
-                                <i class="ti ti-chevron-down text-[15px] text-pos-muted transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}"></i>
-                            </button>
-                            <div class="px-4 pb-[16px] border-t border-pos-border ${isOpen ? 'block' : 'hidden'}">
-                                <div class="grid grid-cols-2 gap-3 pt-4">
-                                    <div class="flex flex-col gap-0.5">
-                                        <span class="text-[10px] font-bold text-pos-muted uppercase tracking-tighter">Berat Badan</span>
-                                        <span class="text-sm font-bold text-pos-text">${h.berat_badan || '-'} kg</span>
-                                    </div>
-                                    <div class="flex flex-col gap-0.5">
-                                        <span class="text-[10px] font-bold text-pos-muted uppercase tracking-tighter">Tinggi Badan</span>
-                                        <span class="text-sm font-bold text-pos-text">${h.tinggi_badan || '-'} cm</span>
-                                    </div>
-                                    <div class="flex flex-col gap-0.5">
-                                        <span class="text-[10px] font-bold text-pos-muted uppercase tracking-tighter">Tekanan Darah</span>
-                                        <span class="text-sm font-bold text-pos-text">${h.tekanan_darah || '-'}</span>
-                                    </div>
-                                    <div class="flex flex-col gap-0.5">
-                                        <span class="text-[10px] font-bold text-pos-muted uppercase tracking-tighter">Level Risiko</span>
-                                        <span class="text-sm font-bold ${h.level_risiko === 'rendah' ? 'text-green-600' : 'text-red-600'} uppercase">${h.level_risiko}</span>
-                                    </div>
-                                </div>
-                                <div class="mt-4 pt-4 border-t border-dashed border-pos-border">
-                                    <span class="text-[10px] font-bold text-pos-navy uppercase tracking-widest block mb-2">Tindak Lanjut</span>
-                                    ${tindakLanjutHtml}
-                                </div>
-                            </div>
-                        </div>`;
-                    }).join('')
-                    : '<div class="bg-white border border-pos-border rounded-xl p-8 text-center"><i class="ti ti-notes-off text-3xl opacity-20 block mb-2"></i><p class="text-sm text-pos-muted">Belum ada riwayat skrining.</p></div>';
-
-                body.innerHTML = `
-                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-pos-border mb-4">
-                        <div class="flex items-center gap-4 mb-5 pb-5 border-b border-pos-border">
-                            <div class="w-14 h-14 rounded-full bg-pos-teal/10 flex items-center justify-center text-pos-teal">
-                                <i class="ti ti-user text-3xl"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-pos-navy font-extrabold text-lg leading-none">${detail.nama}</h3>
-                                <p class="text-xs text-pos-muted font-bold mt-1.5 tracking-wide uppercase">${detail.nik}</p>
-                            </div>
-                        </div>
-                        <div class="space-y-4">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2 text-pos-muted">
-                                    <i class="ti ti-map-pin text-lg"></i>
-                                    <span class="text-xs font-bold uppercase tracking-wider">Wilayah</span>
-                                </div>
-                                <span class="text-sm font-bold text-pos-text">${detail.kecamatan || '-'}</span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2 text-pos-muted">
-                                    <i class="ti ti-phone text-lg"></i>
-                                    <span class="text-xs font-bold uppercase tracking-wider">Kontak</span>
-                                </div>
-                                <span class="text-sm font-bold text-pos-text">${detail.noHp || '-'}</span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2 text-pos-muted">
-                                    <i class="ti ti-category text-lg"></i>
-                                    <span class="text-xs font-bold uppercase tracking-wider">Kategori</span>
-                                </div>
-                                <span class="px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase ${detail.kategori === 'ibu' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'}">${detail.kategori === 'ibu' ? 'Ibu Hamil' : 'Balita'}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="px-1">
-                        <h3 class="text-pos-navy font-extrabold text-[0.95rem] mb-4 flex items-center gap-2">
-                            <i class="ti ti-history text-pos-teal"></i>
-                            Riwayat Pemeriksaan
-                            <span class="bg-pos-teal/10 text-pos-teal text-[10px] px-2 py-0.5 rounded-full">${detail.pemeriksaans.length}</span>
-                        </h3>
-                        <div class="flex flex-col">
-                            ${historyHtml}
-                        </div>
-                    </div>
-                `;
+                activePatientDetail = detail;
+                activePemeriksaanIndex = 0;
+                renderPatientDetails();
             } catch (error) {
+                console.error(error);
                 body.innerHTML = '<div class="p-8 text-center text-red-500 font-bold"><i class="ti ti-alert-triangle text-3xl mb-2"></i><p>Gagal memuat data</p></div>';
-            }
-        }
-
-        function toggleAcc(id) {
-            const el = document.getElementById(id);
-            const body = el.querySelector('div:last-child');
-            const arrow = el.querySelector('i.ti-chevron-down');
-            const isHidden = body.classList.contains('hidden');
-            
-            // Close others (optional)
-            // document.querySelectorAll('[id^="acc-"] div:last-child').forEach(d => d.classList.add('hidden'));
-            // document.querySelectorAll('[id^="acc-"] i.ti-chevron-down').forEach(a => a.classList.remove('rotate-180'));
-
-            if (isHidden) {
-                body.classList.remove('hidden');
-                arrow.classList.add('rotate-180');
-            } else {
-                body.classList.add('hidden');
-                arrow.classList.remove('rotate-180');
             }
         }
 
