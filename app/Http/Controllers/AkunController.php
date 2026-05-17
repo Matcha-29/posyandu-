@@ -28,7 +28,7 @@ class AkunController extends Controller
         if ($request->wantsJson()) {
             return response()->json($users);
         }
-        return view('data_akun', compact('users'));
+        return view('admin.data_akun', compact('users'));
     }
 
     // 3.2 — simpan akun baru

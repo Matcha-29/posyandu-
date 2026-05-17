@@ -139,6 +139,15 @@
     <!-- RIGHT -->
     <div class="right-panel">
       <div class="panel-title" id="panelTitle">HASIL & TINDAK LANJUT SKRINING</div>
+
+      <!-- Patient Summary Header -->
+      <div id="patientSummary" style="background: #f7fafd; border: 1.5px solid var(--border); border-radius: 8px; padding: 12px 16px; margin-bottom: 4px; flex-shrink: 0;">
+        <div style="font-size: 13px; font-weight: 700; color: var(--text);" id="sum-nama">-</div>
+        <div style="font-size: 11px; font-weight: 600; color: #7a8ba0; margin-top: 2px;">
+          NIK: <span id="sum-nik">-</span> &bull; Kategori: <span id="sum-kategori">-</span>
+        </div>
+      </div>
+
       <div id="resultArea"><p style="text-align:center;color:#999">Menghitung skor...</p></div>
       <div class="form-actions">
         <button class="btn-back" onclick="window.location.href='/langkah-3'">Kembali</button>
@@ -255,6 +264,11 @@ document.addEventListener('DOMContentLoaded', function() {
       <td>${p.tglKunjungan||'-'}</td><td>${katLabel}</td>
     </tr>`;
 
+  // Populate patient summary
+  document.getElementById('sum-nama').textContent = p.nama || '-';
+  document.getElementById('sum-nik').textContent = p.nik || '-';
+  document.getElementById('sum-kategori').textContent = katLabel;
+
   const area = document.getElementById('resultArea');
 
   /* ═══ IBU HAMIL ════════════════════════════════════════════════ */
@@ -345,16 +359,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function selesai() {
   const p = JSON.parse(localStorage.getItem('currentPatient') || '{}');
+  const l1 = JSON.parse(localStorage.getItem('langkah1Data') || '{}');
   const l2 = JSON.parse(localStorage.getItem('langkah2Data') || '{}');
   const l3 = JSON.parse(localStorage.getItem('langkah3Data') || '{}');
 
   const payload = {
     patient_id: p.id,
-    tgl_periksa: l2.tgl_periksa,
-    usia_hamil: l2.usiaHamil || null,
-    berat_badan: l2.beratBadan || null,
-    tinggi_badan: l2.tinggiBadan || null,
+    tgl_periksa: l1.tgl_periksa,
+    usia_hamil: l1.usiaHamil || null,
+    berat_badan: l1.beratBadan || null,
+    tinggi_badan: l1.tinggiBadan || null,
     lingkar_kepala: l2.lingkarKepala || null,
+    usia_balita: l1.usiaBalita || null,
     lila: l2.lila || null,
     tekanan_darah: l2.tekananDarah || null,
     hb: l2.hb || null,
@@ -379,6 +395,7 @@ async function selesai() {
     if (response.ok) {
       localStorage.removeItem('langkah3Data');
       localStorage.removeItem('langkah2Data');
+      localStorage.removeItem('langkah1Data');
       localStorage.removeItem('currentPatient');
       document.getElementById('overlay').classList.add('show');
       setTimeout(() => { window.location.href = '/list_data_pasien'; }, 2200);

@@ -108,7 +108,7 @@
                                     {{ $p->patient->kategori == 'ibu' ? 'Ibu Hamil' : 'Balita' }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-sm text-pos-muted font-medium">{{ $p->user->name }}</td>
+                            <td class="px-6 py-4 text-sm text-pos-muted font-medium">{{ optional($p->petugas)->name ?? 'Tidak Ada' }}</td>
                             <td class="px-6 py-4">
                                 @php
                                     $riskColors = [
@@ -208,7 +208,7 @@
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-xs text-pos-muted">Petugas:</span>
-                                <span class="text-xs font-bold">${data.user.name}</span>
+                                <span class="text-xs font-bold">${data.petugas ? data.petugas.name : 'Tidak Ada'}</span>
                             </div>
                         </div>
                     </div>

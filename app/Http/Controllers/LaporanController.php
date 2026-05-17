@@ -54,7 +54,7 @@ class LaporanController extends Controller
             return response()->json(compact('pemeriksaans', 'stats'));
         }
 
-        return view('laporan', compact('pemeriksaans', 'stats'));
+        return view('petugas.laporan', compact('pemeriksaans', 'stats'));
     }
 
     // Export laporan ke CSV sederhana

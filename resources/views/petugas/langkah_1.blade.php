@@ -56,6 +56,13 @@
   .petunjuk-box{background:#e8f5f3;border-left:4px solid var(--teal);border-radius:8px;padding:12px 14px;font-size:12px;line-height:1.7;color:#1a4a45}
   .petunjuk-box strong{display:block;margin-bottom:4px;font-size:13px;color:var(--teal)}
 
+  /* Pengukuran fields */
+  .form-group{display:flex;flex-direction:column;gap:6px}
+  .form-label{font-size:12px;font-weight:700;color:var(--text)}
+  .form-input{border:1.5px solid var(--navy);border-radius:8px;padding:10px 13px;font-size:13px;font-family:inherit;color:var(--text);outline:none;transition:border-color .2s;background:#fff}
+  .form-input:focus{border-color:var(--teal)}
+  .form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
   .form-actions{display:flex;gap:12px;justify-content:flex-end;margin-top:auto;padding-top:10px}
   .btn-back{background:var(--orange);color:#fff;border:none;border-radius:8px;padding:11px 26px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;transition:opacity .2s}
   .btn-back:hover{opacity:.88}
@@ -112,27 +119,24 @@
       </div>
     </div>
 
-    <!-- RIGHT: identitas & petunjuk -->
+    <!-- RIGHT: Data Pengukuran Utama -->
     <div class="right-panel">
-      <div class="panel-title" id="panelTitle">DATA PASIEN – IDENTITAS</div>
-      <div id="catBadge"></div>
-      <div class="info-grid" id="infoGrid">
-        <div class="info-item"><div class="info-label">Nama</div><div class="info-value" id="v-nama">-</div></div>
-        <div class="info-item"><div class="info-label">NIK</div><div class="info-value" id="v-nik">-</div></div>
-        <div class="info-item"><div class="info-label">Tanggal Lahir</div><div class="info-value" id="v-tgl">-</div></div>
-        <div class="info-item"><div class="info-label">No. HP</div><div class="info-value" id="v-hp">-</div></div>
-        <div class="info-item"><div class="info-label">Kunjungan</div><div class="info-value" id="v-kunjungan">-</div></div>
-        <div class="info-item"><div class="info-label">Kategori</div><div class="info-value" id="v-kategori">-</div></div>
+      <div class="panel-title" id="panelTitle">PENGUKURAN UTAMA</div>
+
+      <!-- Patient Summary Header -->
+      <div id="patientSummary" style="background: #f7fafd; border: 1.5px solid var(--border); border-radius: 8px; padding: 12px 16px; margin-bottom: 4px;">
+        <div style="font-size: 13px; font-weight: 700; color: var(--text);" id="sum-nama">-</div>
+        <div style="font-size: 11px; font-weight: 600; color: #7a8ba0; margin-top: 2px;">
+          NIK: <span id="sum-nik">-</span> &bull; Kategori: <span id="sum-kategori">-</span>
+        </div>
       </div>
 
-      <div class="petunjuk-box" id="petunjukBox">
-        <strong>📋 Petunjuk Skrining</strong>
-        Memuat petunjuk...
-      </div>
+      <!-- Form Inputs container -->
+      <div id="formFields"></div>
 
       <div class="form-actions">
         <button class="btn-back" onclick="window.location.href='/list_data_pasien'">Kembali</button>
-        <button class="btn-next" onclick="window.location.href='/langkah-2'">Lanjut</button>
+        <button class="btn-next" onclick="simpanDanLanjut1()">Lanjut</button>
       </div>
     </div>
   </div>
@@ -160,45 +164,88 @@
         <td>${katLabel}</td>
       </tr>`;
 
-    // Panel title
+    // Panel title & badge
     document.getElementById('panelTitle').textContent = isIbu
-      ? 'DATA PASIEN – IBU HAMIL'
-      : (p.kategori === 'balita' ? 'DATA PASIEN – BALITA' : 'DATA PASIEN – LANSIA');
+      ? 'PENGUKURAN UTAMA – IBU HAMIL'
+      : (p.kategori === 'balita' ? 'PENGUKURAN UTAMA – BALITA' : 'PENGUKURAN UTAMA – LANSIA');
 
-    // Badge
-    const badge = document.getElementById('catBadge');
-    badge.innerHTML = `<span class="cat-badge ${p.kategori === 'ibu' ? 'ibu' : 'balita'}">
-      ${isIbu ? '🤰 Ibu Hamil' : (p.kategori === 'balita' ? '👶 Balita' : '👴 Lansia')}
-    </span>`;
+    // Populate patient summary
+    document.getElementById('sum-nama').textContent = p.nama || '-';
+    document.getElementById('sum-nik').textContent = p.nik || '-';
+    document.getElementById('sum-kategori').textContent = katLabel;
 
-    // Info grid
-    document.getElementById('v-nama').textContent = p.nama || '-';
-    document.getElementById('v-nik').textContent = p.nik || '-';
-    document.getElementById('v-tgl').textContent = p.tglLahir || '-';
-    document.getElementById('v-hp').textContent = p.noHp || '-';
-    document.getElementById('v-kunjungan').textContent = p.tglKunjungan || '-';
-    document.getElementById('v-kategori').textContent = katLabel;
+    // Render core measurement fields
+    const saved = JSON.parse(localStorage.getItem('langkah1Data') || '{}');
+    const today = new Date().toISOString().split('T')[0];
 
-    // Petunjuk
-    const pb = document.getElementById('petunjukBox');
+    let fields = `
+      <div class="form-group" style="margin-bottom: 12px;">
+        <label class="form-label">Tanggal Pemeriksaan</label>
+        <input class="form-input" id="tgl_periksa" type="date" value="${saved.tgl_periksa || today}" />
+      </div>
+    `;
+
     if (isIbu) {
-      pb.innerHTML = `<strong>📋 Petunjuk Skrining – Ibu Hamil</strong>
-      Pada langkah berikutnya Anda akan melakukan <b>skrining risiko kehamilan</b> dengan menjawab
-      <b>10 pertanyaan (Ya/Tidak)</b> tentang kondisi ibu. Hasil akan menentukan tingkat risiko:
-      <br>• <b style="color:#16a085">0–1 Ya</b> → Risiko Rendah &nbsp;
-      • <b style="color:#e67e22">2–3 Ya</b> → Risiko Sedang &nbsp;
-      • <b style="color:#e74c3c">≥4 Ya / ada darurat</b> → Risiko Tinggi`;
+      fields += `
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Usia Kehamilan (minggu)</label>
+            <input class="form-input" id="usiaHamil" type="number" min="1" max="42" value="${saved.usiaHamil||p.usiaHamil||''}" placeholder="cth: 28"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Berat Badan (kg)</label>
+            <input class="form-input" id="beratBadan" type="number" step="0.1" value="${saved.beratBadan||''}" placeholder="cth: 58.5"/>
+          </div>
+          <div class="form-group" style="grid-column:span 2">
+            <label class="form-label">Tinggi Badan (cm)</label>
+            <input class="form-input" id="tinggiBadan" type="number" value="${saved.tinggiBadan||''}" placeholder="cth: 160"/>
+          </div>
+        </div>`;
     } else if (p.kategori === 'balita') {
-      pb.innerHTML = `<strong>📋 Petunjuk Skrining – Balita</strong>
-      Pada langkah berikutnya Anda akan melakukan <b>skrining stunting & penyakit serius</b>
-      dengan menjawab pertanyaan <b>Ya/Tidak</b> tentang kondisi balita. Hasil:
-      <br>• <b style="color:#16a085">Normal</b> → Perawatan rutin &nbsp;
-      • <b style="color:#e67e22">Risiko Sedang</b> → PMT + pemantauan &nbsp;
-      • <b style="color:#e74c3c">Risiko Tinggi</b> → Rujuk segera`;
+      let calculatedUsiaBalita = '';
+      if (p.tglLahir) {
+        const birthDate = new Date(p.tglLahir);
+        const checkDate = new Date(saved.tgl_periksa || today);
+        const diffMonths = (checkDate.getFullYear() - birthDate.getFullYear()) * 12 + (checkDate.getMonth() - birthDate.getMonth());
+        calculatedUsiaBalita = diffMonths > 0 ? diffMonths : 0;
+      }
+
+      fields += `
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Usia Balita (bulan)</label>
+            <input class="form-input" id="usiaBalita" type="number" value="${saved.usiaBalita || calculatedUsiaBalita}" placeholder="cth: 18"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Berat Badan (kg)</label>
+            <input class="form-input" id="beratBadan" type="number" step="0.1" value="${saved.beratBadan||''}" placeholder="cth: 10.5"/>
+          </div>
+          <div class="form-group" style="grid-column:span 2">
+            <label class="form-label">Tinggi/Panjang Badan (cm)</label>
+            <input class="form-input" id="tinggiBadan" type="number" step="0.1" value="${saved.tinggiBadan||''}" placeholder="cth: 85"/>
+          </div>
+        </div>`;
     } else {
-      pb.innerHTML = `<strong>📋 Petunjuk</strong>Ikuti langkah berikutnya untuk melengkapi pemeriksaan.`;
+      fields += `<p style="color:#888;font-size:12px;">Tidak ada pengukuran khusus untuk kategori ini.</p>`;
     }
+
+    document.getElementById('formFields').innerHTML = fields;
   });
+
+  function simpanDanLanjut1() {
+    const data = {};
+    document.querySelectorAll('.form-input').forEach(el => {
+      if (el.id) data[el.id] = el.value;
+    });
+
+    if (!data.tgl_periksa) {
+      alert('Tanggal pemeriksaan wajib diisi');
+      return;
+    }
+
+    localStorage.setItem('langkah1Data', JSON.stringify(data));
+    window.location.href = '/langkah-2';
+  }
 </script>
 </body>
 </html>

@@ -158,21 +158,17 @@
     grid-template-columns: 1.5fr 1fr 1fr 1.2fr 1.2fr;
     gap: 32px;
   }
-
-
   .footer-partners {
     display: flex;
     flex-direction: column;
     gap: 15px;
     margin-left: 40px;
   }
-
   .partners-logos {
     display: flex;
     gap: 20px;
     align-items: center;
   }
-
   .partners-logos img {
     height: 60px;
     width: auto;
@@ -181,10 +177,6 @@
     transition: transform 0.3s ease;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
   }
-
-
-
-
   .partners-logos img:hover {
     transform: scale(1.1);
     opacity: 1;
@@ -197,7 +189,6 @@
     opacity: 0.1;
     pointer-events: none;
   }
-
   .footer-brand h2 {
     font-size: 1.35rem;
     margin-bottom: 12px;
@@ -270,7 +261,6 @@
     transform: translateY(-2px);
     box-shadow: 0 6px 15px rgba(0,0,0,0.15);
   }
-
   .footer-bottom {
     margin-top: 28px;
     border-top: 1px solid rgba(255,255,255,.18);

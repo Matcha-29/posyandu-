@@ -107,6 +107,15 @@
 
     <div class="right-panel">
       <div class="panel-title" id="panelTitle">DATA PENGUKURAN</div>
+
+      <!-- Patient Summary Header -->
+      <div id="patientSummary" style="background: #f7fafd; border: 1.5px solid var(--border); border-radius: 8px; padding: 12px 16px; margin-bottom: 4px;">
+        <div style="font-size: 13px; font-weight: 700; color: var(--text);" id="sum-nama">-</div>
+        <div style="font-size: 11px; font-weight: 600; color: #7a8ba0; margin-top: 2px;">
+          NIK: <span id="sum-nik">-</span> &bull; Kategori: <span id="sum-kategori">-</span>
+        </div>
+      </div>
+
       <div id="formFields"></div>
       <div class="form-actions">
         <button class="btn-back" onclick="goBack()">Kembali</button>
@@ -136,35 +145,22 @@
       </tr>`;
 
     document.getElementById('panelTitle').textContent = isIbu
-      ? 'PENGUKURAN – IBU HAMIL'
-      : (isBalita ? 'PENGUKURAN – BALITA' : 'PENGUKURAN – LANSIA');
+      ? 'PENGUKURAN TAMBAHAN – IBU HAMIL'
+      : (isBalita ? 'PENGUKURAN TAMBAHAN – BALITA' : 'PENGUKURAN TAMBAHAN – LANSIA');
+
+    // Populate patient summary
+    document.getElementById('sum-nama').textContent = p.nama || '-';
+    document.getElementById('sum-nik').textContent = p.nik || '-';
+    document.getElementById('sum-kategori').textContent = katLabel;
 
     const saved = JSON.parse(localStorage.getItem('langkah2Data') || '{}');
-    const today = new Date().toISOString().split('T')[0];
 
-    let fields = `
-      <div class="form-group" style="grid-column:span 2">
-        <label class="form-label">Tanggal Pemeriksaan</label>
-        <input class="form-input" id="tgl_periksa" type="date" value="${saved.tgl_periksa || today}" />
-      </div>
-    `;
+    let fields = ``;
 
     if (isIbu) {
       fields += `
         <div class="form-grid-2">
-          <div class="form-group">
-            <label class="form-label">Usia Kehamilan (minggu)</label>
-            <input class="form-input" id="usiaHamil" type="number" min="1" max="42" value="${saved.usiaHamil||p.usiaHamil||''}" placeholder="cth: 28"/>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Berat Badan (kg)</label>
-            <input class="form-input" id="beratBadan" type="number" step="0.1" value="${saved.beratBadan||''}" placeholder="cth: 58.5"/>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Tinggi Badan (cm)</label>
-            <input class="form-input" id="tinggiBadan" type="number" value="${saved.tinggiBadan||''}" placeholder="cth: 160"/>
-          </div>
-          <div class="form-group">
+          <div class="form-group" style="grid-column:span 2">
             <label class="form-label">Lingkar Lengan Atas / LILA (cm)</label>
             <input class="form-input" id="lila" type="number" step="0.1" value="${saved.lila||''}" placeholder="cth: 24"/>
           </div>
@@ -179,23 +175,11 @@
         </div>`;
     } else if (isBalita) {
       fields += `
-        <div class="section-label">Pengukuran Fisik Balita</div>
-        <div class="form-grid-2">
-          <div class="form-group">
-            <label class="form-label">Berat Badan (kg)</label>
-            <input class="form-input" id="beratBadan" type="number" step="0.1" value="${saved.beratBadan||''}" placeholder="cth: 10.5"/>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Tinggi/Panjang Badan (cm)</label>
-            <input class="form-input" id="tinggiBadan" type="number" step="0.1" value="${saved.tinggiBadan||''}" placeholder="cth: 85"/>
-          </div>
-          <div class="form-group">
+        <div class="section-label">Pengukuran Tambahan Balita</div>
+        <div class="form-grid-2" style="margin-top: 10px;">
+          <div class="form-group" style="grid-column:span 2">
             <label class="form-label">Lingkar Kepala (cm)</label>
             <input class="form-input" id="lingkarKepala" type="number" step="0.1" value="${saved.lingkarKepala||''}" placeholder="cth: 44"/>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Usia Balita (bulan)</label>
-            <input class="form-input" id="usiaBalita" type="number" value="${saved.usiaBalita||''}" placeholder="cth: 18"/>
           </div>
           <div class="form-group" style="grid-column:span 2">
             <label class="form-label">Status Imunisasi</label>
@@ -207,6 +191,8 @@
             </select>
           </div>
         </div>`;
+    } else {
+      fields += `<p style="color:#888;font-size:12px;">Tidak ada pengukuran tambahan untuk kategori ini.</p>`;
     }
     document.getElementById('formFields').innerHTML = fields;
   });
@@ -218,11 +204,6 @@
     document.querySelectorAll('.form-input').forEach(el => {
       if (el.id) data[el.id] = el.value;
     });
-    
-    if (!data.tgl_periksa) {
-      alert('Tanggal pemeriksaan wajib diisi');
-      return;
-    }
 
     localStorage.setItem('langkah2Data', JSON.stringify(data));
     window.location.href = '/langkah-3';

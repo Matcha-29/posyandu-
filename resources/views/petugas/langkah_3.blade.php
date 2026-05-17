@@ -134,6 +134,15 @@
     <!-- RIGHT -->
     <div class="right-panel">
       <div class="panel-title" id="panelTitle">KUESIONER SKRINING</div>
+
+      <!-- Patient Summary Header -->
+      <div id="patientSummary" style="background: #f7fafd; border: 1.5px solid var(--border); border-radius: 8px; padding: 12px 16px; margin-bottom: 4px; flex-shrink: 0;">
+        <div style="font-size: 13px; font-weight: 700; color: var(--text);" id="sum-nama">-</div>
+        <div style="font-size: 11px; font-weight: 600; color: #7a8ba0; margin-top: 2px;">
+          NIK: <span id="sum-nik">-</span> &bull; Kategori: <span id="sum-kategori">-</span>
+        </div>
+      </div>
+
       <div class="q-scroll" id="qArea">
         <p style="text-align:center;color:#999;padding:20px">Memuat kuesioner...</p>
       </div>
@@ -157,7 +166,7 @@
     { id:'q7',  text:'Apakah ibu mengalami demam tinggi?',                            darurat:false },
     { id:'q8',  text:'Apakah ibu tidak bisa makan/minum sama sekali (mual muntah berat)?', darurat:false },
     { id:'q9',  text:'Apakah berat badan ibu tidak naik atau turun?',                 darurat:false },
-    { id:'q10', text:'Apakah ibu terlihat pucat dan sangat lemas?',                   darurat:false },
+    { id:'q10', text:'Apakah ibu terlihat pucat and sangat lemas?',                   darurat:false },
   ];
 
   // ── BALITA STUNTING – 6 pertanyaan ─────────────────────────────────────────
@@ -224,6 +233,11 @@
         <td>1</td><td>${p.nama||'-'}</td><td>${p.nik||'-'}</td>
         <td>${p.tglKunjungan||'-'}</td><td>${katLabel}</td>
       </tr>`;
+
+    // Populate patient summary
+    document.getElementById('sum-nama').textContent = p.nama || '-';
+    document.getElementById('sum-nik').textContent = p.nik || '-';
+    document.getElementById('sum-kategori').textContent = katLabel;
 
     const qArea = document.getElementById('qArea');
 

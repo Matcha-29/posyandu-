@@ -16,7 +16,7 @@ class PemeriksaanController extends Controller
     // 2.1 — form input pemeriksaan (tampilkan langkah berdasar kategori)
     public function create(Patient $patient)
     {
-        return view('langkah_1', compact('patient'));
+        return view('petugas.langkah_1', compact('patient'));
     }
 
     // 2.2 — simpan hasil pemeriksaan lengkap dari langkah 2–4
@@ -71,7 +71,7 @@ class PemeriksaanController extends Controller
         if (request()->wantsJson()) {
             return response()->json($riwayat);
         }
-        return view('riwayat', compact('patient', 'riwayat'));
+        return view('petugas.riwayat', compact('patient', 'riwayat'));
     }
 
     // Detail satu pemeriksaan

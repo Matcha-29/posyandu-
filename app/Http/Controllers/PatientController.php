@@ -31,7 +31,7 @@ class PatientController extends Controller
         if ($request->wantsJson()) {
             return response()->json($patients);
         }
-        return view('list_data_pasien', compact('patients'));
+        return view('petugas.list_data_pasien', compact('patients'));
     }
 
     // 1.4 — detail satu pasien beserta riwayat pemeriksaan
@@ -42,7 +42,7 @@ class PatientController extends Controller
         if (request()->wantsJson()) {
             return response()->json($patient);
         }
-        return view('data_pasien', compact('patient'));
+        return view('petugas.data_pasien', compact('patient'));
     }
 
     // 1.5 — tambah pasien baru
@@ -121,6 +121,6 @@ class PatientController extends Controller
             'values' => [180, 210, 195, 240, 300, 390, 460, 380, 310, 350, 420, 400]
         ];
 
-        return view('dashboard', compact('totalPasien', 'totalBalita', 'totalIbu', 'latestPatients', 'chartData'));
+        return view('admin.dashboard', compact('totalPasien', 'totalBalita', 'totalIbu', 'latestPatients', 'chartData'));
     }
 }

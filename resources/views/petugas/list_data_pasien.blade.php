@@ -316,6 +316,7 @@
             const p = data.find(x => x.id === id);
             if(!p) return;
             localStorage.setItem('currentPatient', JSON.stringify(p));
+            localStorage.removeItem('langkah1Data');
             localStorage.removeItem('langkah2Data');
             localStorage.removeItem('langkah3Data');
             window.location.href = '/langkah-1';

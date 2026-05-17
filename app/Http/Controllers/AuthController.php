@@ -13,9 +13,12 @@ class AuthController extends Controller
     public function showLogin()
     {
         if (Auth::check()) {
+            if (Auth::user()->role === 'admin') {
+                return redirect('/dashboard');
+            }
             return redirect('/list_data_pasien');
         }
-        return view('login');
+        return view('auth.login');
     }
 
     // Proses login
@@ -43,6 +46,10 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
+        if ($user->role === 'admin') {
+            return redirect('/dashboard');
+        }
+
         return redirect('/list_data_pasien');
     }
 
@@ -58,7 +65,7 @@ class AuthController extends Controller
     // Tampilkan form daftar
     public function showRegister()
     {
-        return view('daftar');
+        return view('auth.daftar');
     }
 
     // Proses daftar akun baru (petugas mendaftar sendiri)

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Form Ibu Hamil — POSYANDU</title>
+    <title>Form Balita — POSYANDU</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <style>
@@ -15,7 +15,6 @@
             --bg:    #f5f7f6;
             --border:#d0e4e0;
             --text:  #1a1a1a;
-            --muted: #888;
         }
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -37,113 +36,72 @@
         }
         .top-bar .back-btn {
             background: rgba(255,255,255,.2);
-            border: none;
-            border-radius: 8px;
-            color: var(--white);
-            cursor: pointer;
+            border: none; border-radius: 8px;
+            color: var(--white); cursor: pointer;
             width: 34px; height: 34px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.1rem;
-            transition: background .2s;
+            font-size: 1.1rem; transition: background .2s;
             text-decoration: none;
         }
         .top-bar .back-btn:hover { background: rgba(255,255,255,.3); }
         .top-bar .brand { font-size: 1.1rem; font-weight: 800; color: var(--white); letter-spacing: .08em; }
 
         .wrapper {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 36px 20px 48px;
-            gap: 28px;
-            width: 100%;
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; padding: 36px 20px 48px;
+            gap: 28px; width: 100%;
         }
 
         .page-title-btn {
-            background: var(--teal);
-            color: var(--white);
-            font-size: 1rem;
-            font-weight: 800;
-            letter-spacing: .1em;
-            padding: 18px 60px;
-            border-radius: 14px;
-            border: none;
-            pointer-events: none;
+            background: var(--teal); color: var(--white);
+            font-size: 1rem; font-weight: 800; letter-spacing: .1em;
+            padding: 18px 60px; border-radius: 14px;
+            border: none; pointer-events: none;
             box-shadow: 0 4px 20px rgba(14,118,109,.25);
         }
 
-        /* main card — matches design */
         .form-card {
-            width: 100%;
-            max-width: 1100px;
+            width: 100%; max-width: 1100px;
             background: var(--white);
             border-radius: 18px;
             border: 1.5px solid var(--border);
             box-shadow: 0 4px 24px rgba(0,0,0,.07);
-            display: flex;
-            overflow: hidden;
+            display: flex; overflow: hidden;
             animation: fadeUp .5s cubic-bezier(.22,.68,0,1.15) both;
         }
         @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
 
-        /* left panel — logo */
         .logo-panel {
-            width: 280px;
-            flex-shrink: 0;
+            width: 280px; flex-shrink: 0;
             border-right: 1.5px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 24px;
-            background: #fafcfb;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 40px 24px; background: #fafcfb;
         }
-        .logo-panel img {
-            width: 160px;
-            height: 160px;
-            object-fit: contain;
-        }
+        .logo-panel img { width: 160px; height: 160px; object-fit: contain; }
 
-        /* right panel — form */
-        .form-panel {
-            flex: 1;
-            padding: 36px 40px 40px;
-        }
+        .form-panel { flex: 1; padding: 36px 40px 40px; }
 
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             column-gap: 32px;
-            row-gap: 0;
         }
 
-        .form-group {
-            margin-bottom: 18px;
-        }
-
+        .form-group { margin-bottom: 18px; }
         .form-group label {
-            display: block;
-            font-size: .93rem;
-            font-weight: 700;
-            color: var(--text);
-            margin-bottom: 7px;
+            display: block; font-size: .93rem; font-weight: 700;
+            color: var(--text); margin-bottom: 7px;
         }
-
-        .form-group input {
-            width: 100%;
-            padding: 11px 14px;
-            border: 1.5px solid var(--border);
-            border-radius: 8px;
-            font-family: inherit;
-            font-size: .92rem;
-            color: var(--text);
-            background: var(--white);
-            outline: none;
+        .form-group input, .form-group select {
+            width: 100%; padding: 11px 14px;
+            border: 1.5px solid var(--border); border-radius: 8px;
+            font-family: inherit; font-size: .92rem; color: var(--text);
+            background: var(--white); outline: none;
             transition: border-color .2s, box-shadow .2s;
+            appearance: none;
         }
-        .form-group input::placeholder { color: #ccc; }
-        .form-group input:focus {
+        .form-group input:focus, .form-group select:focus {
             border-color: var(--teal);
             box-shadow: 0 0 0 3px rgba(14,118,109,.1);
         }
@@ -185,28 +143,18 @@
         .btn-kembali:hover { background: #d4eeeb; transform: translateY(-2px); }
         .btn-simpan:active, .btn-kembali:active { transform: translateY(0); }
 
-        /* toast */
         .toast {
-            display: none;
-            position: fixed;
+            display: none; position: fixed;
             bottom: 32px; right: 32px;
-            background: var(--teal);
-            color: var(--white);
-            padding: 14px 24px;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: .9rem;
-            box-shadow: 0 6px 24px rgba(14,118,109,.3);
-            z-index: 999;
-            animation: slideInRight .3s ease;
+            background: var(--teal); color: var(--white);
+            padding: 14px 24px; border-radius: 10px;
+            font-weight: 700; font-size: .9rem;
+            box-shadow: 0 6px 24px rgba(14,118,109,.3); z-index: 999;
         }
-        @keyframes slideInRight { from { opacity:0; transform:translateX(40px); } to { opacity:1; transform:none; } }
 
         @media (max-width: 800px) {
             .form-card { flex-direction: column; }
-            .logo-panel { width: 100%; border-right: none; border-bottom: 1.5px solid var(--border); padding: 28px; }
-            .logo-panel img { width: 100px; height: 100px; }
-            .form-panel { padding: 24px 20px; }
+            .logo-panel { width: 100%; border-right: none; border-bottom: 1.5px solid var(--border); }
             .form-grid { grid-template-columns: 1fr; }
         }
     </style>
@@ -220,45 +168,50 @@
     <div class="page-title-btn">FORM PENDAFTARAN PASIEN</div>
 
     <div class="form-card">
-
-        <!-- Logo Panel -->
         <div class="logo-panel">
-    <img src="{{ asset('image/logo.png') }}" alt="Logo POSYANDU" />      
-    </div>
+            <img src="{{ asset('image/logo.png') }}" alt="Logo POSYANDU" />
+        </div>
 
-        <!-- Form Panel -->
         <div class="form-panel">
             <div class="form-grid">
 
                 <!-- Kolom Kiri -->
                 <div>
                     <div class="form-group">
-                        <label>Nama :</label>
-                        <input type="text" id="nama" placeholder="" />
+                        <label>Nama Balita :</label>
+                        <input type="text" id="nama" />
                     </div>
                     <div class="form-group">
                         <label>NIK :</label>
-                        <input type="text" id="nik" placeholder="" maxlength="16" />
+                        <input type="text" id="nik" maxlength="16" />
                     </div>
                     <div class="form-group">
-                        <label>Tanggal Lahir/Usia :</label>
+                        <label>Tanggal Lahir :</label>
                         <input type="date" id="tglLahir" />
                     </div>
                     <div class="form-group">
-                        <label>Nama Suami :</label>
-                        <input type="text" id="namaSuami" placeholder="" />
+                        <label>Jenis Kelamin :</label>
+                        <select id="jenisKelamin">
+                            <option value="">-- Pilih --</option>
+                            <option value="L">Laki-laki</option>
+                            <option value="P">Perempuan</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Nama Orang Tua :</label>
+                        <input type="text" id="namaOrangTua" />
                     </div>
                     <div class="form-group">
                         <label>No. Hp :</label>
-                        <input type="text" id="noHp" placeholder="" />
+                        <input type="text" id="noHp" />
                     </div>
                     <div class="form-group">
                         <label>Alamat :</label>
-                        <input type="text" id="alamat" placeholder="" />
+                        <input type="text" id="alamat" />
                     </div>
                     <div class="form-group">
                         <label>Dusun/RT / RW</label>
-                        <input type="text" id="dusun" placeholder="" />
+                        <input type="text" id="dusun" />
                     </div>
                 </div>
 
@@ -266,30 +219,35 @@
                 <div>
                     <div class="form-group">
                         <label>Desa/Kelurahan :</label>
-                        <input type="text" id="desa" placeholder="" />
+                        <input type="text" id="desa" />
                     </div>
                     <div class="form-group">
                         <label>Kecamatan :</label>
-                        <input type="text" id="kecamatan" placeholder="" />
-                    </div>
-                    <div class="form-group">
-                        <label>Jarak anak sebelumnya dengan kehamilan:</label>
-                        <input type="text" id="jarakAnak" placeholder="" />
-                    </div>
-                    <div class="form-group">
-                        <label>Hamil Anak ke :</label>
-                        <input type="number" id="hamilAnakKe" placeholder="" min="1" />
+                        <input type="text" id="kecamatan" />
                     </div>
                     <div class="form-group">
                         <label>Berat Badan (kg) :</label>
-                        <input type="number" id="beratBadan" placeholder="" step="0.1" />
+                        <input type="number" id="beratBadan" step="0.1" />
                     </div>
                     <div class="form-group">
-                        <label>Tinggi Badan :</label>
-                        <input type="number" id="tinggiBadan" placeholder="" />
+                        <label>Tinggi Badan (cm) :</label>
+                        <input type="number" id="tinggiBadan" />
+                    </div>
+                    <div class="form-group">
+                        <label>Lingkar Kepala (cm) :</label>
+                        <input type="number" id="lingkarKepala" step="0.1" />
+                    </div>
+                    <div class="form-group">
+                        <label>Status Gizi :</label>
+                        <select id="statusGizi">
+                            <option value="">-- Pilih --</option>
+                            <option value="baik">Baik</option>
+                            <option value="kurang">Kurang</option>
+                            <option value="lebih">Lebih</option>
+                            <option value="buruk">Buruk</option>
+                        </select>
                     </div>
 
-                    <!-- Simpan -->
                     <div class="btn-simpan-wrap">
                         <button type="button" class="btn-kembali" onclick="location.href='/list_data_pasien'">KEMBALI</button>
                         <button class="btn-simpan" onclick="simpan()">SIMPAN</button>
@@ -313,12 +271,11 @@
             alamat: document.getElementById('alamat').value.trim(),
             dusun: document.getElementById('dusun').value.trim(),
             kecamatan: document.getElementById('kecamatan').value.trim(),
-            anakKe: document.getElementById('hamilAnakKe').value,
-            kategori: 'ibu'
+            kategori: 'balita'
         };
 
         if (!payload.nama || !payload.nik || !payload.noHp) {
-            alert('Nama, NIK, dan No. HP wajib diisi.');
+            alert('Nama balita, NIK, dan No. HP wajib diisi.');
             return;
         }
 

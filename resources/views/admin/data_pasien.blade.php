@@ -1,17 +1,13 @@
-<!DOCTYPE html>
-<html lang="id">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Data Pasien – Posyandu</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet" />
+@section('title', 'Data Pasien — POSYANDU')
+
+@section('content')
     <style>
         :root {
-            --green-dark: #1a5c38;
-            --green-mid: #2d8653;
-            --green-light: #3dab6a;
+            --green-dark: #0A5C55;
+            --green-mid: #0E766D;
+            --green-light: #0D7E73;
             --green-pale: #e8f5ee;
             --teal: #1e9e8c;
             --white: #ffffff;
@@ -25,117 +21,6 @@
             --radius: 14px;
             --shadow: 0 2px 16px rgba(26, 92, 56, .10);
             --shadow-lg: 0 6px 32px rgba(26, 92, 56, .14);
-        }
-
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: var(--gray-50);
-            color: var(--gray-900);
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* ── SIDEBAR ── */
-        .sidebar {
-            width: var(--sidebar-w);
-            background: var(--green-dark);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 32px 0 24px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            z-index: 100;
-            box-shadow: 4px 0 24px rgba(26, 92, 56, .18);
-        }
-
-        .sidebar-logo {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 40px;
-            padding: 0 20px;
-        }
-
-        .logo-wrap {
-            width: 100px;
-            height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .logo-wrap img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        .nav {
-            width: 100%;
-            padding: 0 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 13px 18px;
-            border-radius: 10px;
-            color: rgba(255, 255, 255, .65);
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all .2s;
-            text-decoration: none;
-        }
-
-        .nav-item:hover {
-            background: rgba(255, 255, 255, .08);
-            color: #fff;
-        }
-
-        .nav-item.active {
-            background: var(--green-light);
-            color: #fff;
-            box-shadow: 0 4px 14px rgba(61, 171, 106, .35);
-        }
-
-        .nav-logout {
-            margin-top: auto;
-            width: 100%;
-            padding: 0 16px 8px;
-        }
-
-        .nav-logout .nav-item {
-            color: rgba(255, 255, 255, .5);
-        }
-
-        .nav-logout .nav-item:hover {
-            color: #ff8080;
-            background: rgba(255, 80, 80, .08);
-        }
-
-        /* ── MAIN ── */
-        .main {
-            margin-left: var(--sidebar-w);
-            flex: 1;
-            padding: 36px 40px;
-            min-height: 100vh;
         }
 
         /* ── TOPBAR ── */
@@ -270,123 +155,9 @@
         }
 
         /* ── STAT CARDS ── */
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-bottom: 28px;
-        }
-
-        .stat-card {
-            background: var(--white);
-            border-radius: var(--radius);
-            padding: 22px 28px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--gray-100);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: transform .2s, box-shadow .2s;
-            animation: fadeUp .4s ease both;
-        }
-
-        .stat-card:nth-child(1) {
-            animation-delay: .08s;
-        }
-
-        .stat-card:nth-child(2) {
-            animation-delay: .13s;
-        }
-
-        .stat-card:nth-child(3) {
-            animation-delay: .18s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .stat-info .stat-label {
-            font-size: 13px;
-            color: var(--gray-500);
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .stat-info .stat-value {
-            font-size: 32px;
-            font-weight: 800;
-            color: var(--gray-900);
-            line-height: 1;
-        }
-
-        .stat-icon-img {
-            width: 56px;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: .85;
-        }
-
-        .stat-icon-img svg {
-            width: 52px;
-            height: 52px;
-        }
-
-        /* ── TABLE ── */
-        .table-card {
-            background: var(--white);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            border: 1px solid var(--gray-100);
-            overflow: hidden;
-            margin-bottom: 24px;
-            animation: fadeUp .4s .22s ease both;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        thead tr {
-            background: var(--green-dark);
-        }
-
-        thead th {
-            padding: 14px 20px;
-            text-align: left;
-            font-size: 13px;
-            font-weight: 700;
-            color: #fff;
-            letter-spacing: .3px;
-        }
-
-        tbody tr {
-            border-bottom: 1px solid var(--gray-100);
-            transition: background .15s;
-        }
-
-        tbody tr:last-child {
-            border-bottom: none;
-        }
-
-        tbody tr:nth-child(even) {
-            background: #f0f8f4;
-        }
-
-        tbody tr:hover {
-            background: var(--green-pale);
-        }
-
-        tbody td {
-            padding: 14px 20px;
-            font-size: 14px;
-            color: var(--gray-700);
-            font-weight: 500;
-        }
+        .stat-card:nth-child(1) { animation-delay: .05s; }
+        .stat-card:nth-child(2) { animation-delay: .10s; }
+        .stat-card:nth-child(3) { animation-delay: .15s; }
 
         /* Action icons */
         .action-btns {
@@ -922,87 +693,44 @@
                 display: none;
             }
         }
+        .hidden {
+            display: none !important;
+        }
+        .translate-x-full {
+            transform: translateX(100%) !important;
+        }
     </style>
-</head>
 
-<body>
-
-    <!-- ══ SIDEBAR ══ -->
-    <aside class="sidebar">
-        <div class="sidebar-logo">
-            <div class="logo-wrap">
-                <img src="{{ asset('image/logo.png') }}" alt="Logo POSYANDU" />
+    <!-- Topbar -->
+    <div class="topbar flex items-center justify-between mb-8">
+        <div class="topbar-title">
+            <h1 class="text-[36px] font-extrabold text-pos-gray-900 leading-none">Data Pasien</h1>
+        </div>
+        <div class="admin-badge flex items-center gap-3 bg-white border border-pos-gray-100 rounded-full px-4 py-2 shadow-pos-shadow">
+            <img class="w-10 h-10 rounded-full object-cover border border-pos-green-light" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&h=80&q=80" alt="Admin" />
+            <div class="text-left">
+                <p class="text-xs font-bold leading-none text-pos-gray-900">{{ Auth::user()->name }}</p>
+                <p class="text-[9px] font-bold text-pos-gray-500 uppercase tracking-widest mt-1">{{ Auth::user()->role }}</p>
             </div>
         </div>
-
-        <nav class="nav">
-            <a class="nav-item" href="/dashboard">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" />
-                    <path d="M9 21V12h6v9" />
-                </svg>
-                Dashboard
-            </a>
-            <a class="nav-item active" href="/data_pasien">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-                    <circle cx="9" cy="7" r="4" />
-                    <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
-                </svg>
-                Data Pasien
-            </a>
-            <a class="nav-item" href="/data_akun">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="8" r="4" />
-                    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-                </svg>
-                Data Akun
-            </a>
-        </nav>
-
-        <div class="nav-logout">
-            <a class="nav-item" href="/login">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
-                    <polyline points="16 17 21 12 16 7" />
-                    <line x1="21" y1="12" x2="9" y2="12" />
-                </svg>
-                Logout
-            </a>
-        </div>
-    </aside>
-
-    <!-- ══ MAIN ══ -->
-    <main class="main">
-
-        <!-- Topbar -->
-        <div class="topbar">
-            <h1>Data Pasien</h1>
-            <div class="admin-badge">
-                <div class="admin-avatar-placeholder">A</div>
-                <span class="admin-name">Admin</span>
-            </div>
-        </div>
+    </div>
 
         <!-- Filter -->
         <div class="filter-row">
             <div class="select-wrap">
-                <select>
-                    <option>Kategori</option>
-                    <option>Ibu Hamil</option>
-                    <option>Balita</option>
+                <select id="katSelect" onchange="applyFilters()">
+                    <option value="">Kategori</option>
+                    <option value="ibu">Ibu Hamil</option>
+                    <option value="balita">Balita</option>
                 </select>
             </div>
             <div class="select-wrap">
-                <select>
-                    <option>Filter</option>
-                    <option>Terbaru</option>
-                    <option>Terlama</option>
-                    <option>A–Z</option>
+                <select id="sortSelect" onchange="applyFilters()">
+                    <option value="">Filter</option>
+                    <option value="terbaru">Terbaru</option>
+                    <option value="terlama">Terlama</option>
+                    <option value="az">A–Z</option>
+                    <option value="za">Z-A</option>
                 </select>
             </div>
         </div>
@@ -1014,74 +742,58 @@
                 <circle cx="11" cy="11" r="8" />
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
-            <input type="text" placeholder="Search user" id="searchInput" oninput="filterTable()" />
+            <input type="text" placeholder="Search user" id="searchInput" oninput="applyFilters()" />
         </div>
 
         <!-- Stat Cards -->
-        <div class="stats-row">
+        <div class="stats-row grid grid-cols-3 gap-5 mb-7">
             <div class="stat-card">
+                <div class="stat-icon w-[52px] h-[52px] rounded-xl flex items-center justify-center shrink-0 bg-[#fff4e5]">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+                    </svg>
+                </div>
                 <div class="stat-info">
                     <div class="stat-label">Total Pasien</div>
-                    <div class="stat-value">4,222</div>
-                </div>
-                <div class="stat-icon-img">
-                    <!-- hand + people icon -->
-                    <svg viewBox="0 0 52 52" fill="none" stroke="#1a2e26" stroke-width="1.6" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <circle cx="20" cy="12" r="5" />
-                        <path d="M10 30c0-5.5 4.5-9 10-9s10 3.5 10 9" />
-                        <circle cx="34" cy="14" r="4" />
-                        <path d="M26 30c1-4 4-7 8-7s7 3 8 7" opacity=".5" />
-                        <path d="M8 38c3 3 8 5 14 5s11-2 14-5" stroke-width="1.4" opacity=".4" />
-                        <path d="M6 34c0 0 4 6 20 6" stroke-width="1.4" opacity=".4" />
-                    </svg>
+                    <div class="stat-value">{{ number_format($totalPasien) }}</div>
                 </div>
             </div>
 
             <div class="stat-card">
-                <div class="stat-info">
-                    <div class="stat-label">Total Ibu Hamil</div>
-                    <div class="stat-value">2,222</div>
-                </div>
-                <div class="stat-icon-img">
-                    <!-- pregnant woman icon -->
-                    <svg viewBox="0 0 52 52" fill="none" stroke="#1a2e26" stroke-width="1.6" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <circle cx="26" cy="10" r="5" />
-                        <path d="M20 20h12" />
-                        <path d="M22 20v8c0 5 3 9 4 9s4-4 4-9v-8" />
-                        <ellipse cx="30" cy="30" rx="4" ry="5" opacity=".5" />
-                        <path d="M20 44v-6M32 44v-6" opacity=".5" />
+                <div class="stat-icon w-[52px] h-[52px] rounded-xl flex items-center justify-center shrink-0 bg-[#e4f7f5]">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1e9e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="9" cy="6" r="3"/>
+                        <path d="M4 20v-2a5 5 0 015-5h0a5 5 0 015 5v2"/>
+                        <circle cx="17" cy="4" r="2" opacity=".6"/>
+                        <path d="M14 8h3" opacity=".6"/>
                     </svg>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-label">Balita</div>
+                    <div class="stat-value">{{ number_format($totalBalita) }}</div>
                 </div>
             </div>
 
             <div class="stat-card">
-                <div class="stat-info">
-                    <div class="stat-label">Total Balita</div>
-                    <div class="stat-value">122</div>
-                </div>
-                <div class="stat-icon-img">
-                    <!-- baby / child icon -->
-                    <svg viewBox="0 0 52 52" fill="none" stroke="#1a2e26" stroke-width="1.6" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <circle cx="26" cy="14" r="6" />
-                        <path d="M18 28c0-4.4 3.6-8 8-8s8 3.6 8 8" />
-                        <path d="M14 36c0 0 3-4 12-4s12 4 12 4" opacity=".5" />
-                        <circle cx="22" cy="13" r="1" fill="#1a2e26" stroke="none" />
-                        <circle cx="30" cy="13" r="1" fill="#1a2e26" stroke="none" />
-                        <path d="M23 17c1 1.5 3 1.5 4 0" stroke-width="1.4" />
-                        <!-- ears -->
-                        <path d="M20 12c-2-1-4 1-3 4" stroke-width="1.3" opacity=".6" />
-                        <path d="M32 12c2-1 4 1 3 4" stroke-width="1.3" opacity=".6" />
+                <div class="stat-icon w-[52px] h-[52px] rounded-xl flex items-center justify-center shrink-0 bg-pos-green-pale">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2d8653" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="7" r="4"/>
+                        <path d="M6 21v-1a6 6 0 0112 0v1"/>
+                        <path d="M9 14c1 4 5 4 6 0" stroke-width="1.5" opacity=".7"/>
                     </svg>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-label">Ibu Hamil</div>
+                    <div class="stat-value">{{ number_format($totalIgu) }}</div>
                 </div>
             </div>
         </div>
 
         <!-- Table -->
-        <div class="table-card">
-            <table id="pasienTable">
+        <div class="pos-table-card">
+            <table id="pasienTable" class="pos-table">
                 <thead>
                     <tr>
                         <th>No</th>
@@ -1093,27 +805,32 @@
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    <tr>
-                        <td>1</td>
-                        <td>Alex</td>
-                        <td>3476537829398</td>
-                        <td>Jln. Mawar</td>
-                        <td>Ibu Hamil</td>
+                    @foreach($patients as $index => $d)
+                    <tr onclick="goToForm({{ $d->id }})" style="cursor: pointer;">
+                        <td>{{ $index + 1 }}</td>
+                        <td style="font-weight: 700; color: var(--gray-900);">{{ $d->nama }}</td>
+                        <td style="font-weight: 700; color: var(--gray-900);">{{ $d->nik }}</td>
+                        <td>{{ $d->alamat }}</td>
                         <td>
+                            <span class="badge-kategori {{ $d->kategori }}" style="padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; background: {{ $d->kategori === 'ibu' ? '#e4f7f5' : '#e8f5ee' }}; color: {{ $d->kategori === 'ibu' ? '#1e9e8c' : '#1a5c38' }};">
+                                {{ $d->kategori === 'ibu' ? 'Ibu Hamil' : 'Balita' }}
+                            </span>
+                        </td>
+                        <td onclick="event.stopPropagation()">
                             <div class="action-btns">
-                                <button class="btn-icon btn-view" title="Lihat"><svg width="16" height="16"
+                                <button class="btn-icon btn-view" onclick="lihat({{ $d->id }})" title="Lihat"><svg width="16" height="16"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
                                         stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                                         <circle cx="12" cy="12" r="3" />
                                     </svg></button>
-                                <button class="btn-icon btn-block" title="Blokir"><svg width="16" height="16"
+                                <button class="btn-icon btn-block" onclick="hapus({{ $d->id }})" title="Hapus" style="color: #ef4444;"><svg width="16" height="16"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
                                         stroke-linecap="round" stroke-linejoin="round">
                                         <circle cx="12" cy="12" r="10" />
                                         <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
                                     </svg></button>
-                                <button class="btn-icon btn-edit" title="Edit"><svg width="16" height="16"
+                                <button class="btn-icon btn-edit" onclick="edit({{ $d->id }})" title="Edit"><svg width="16" height="16"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
                                         stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
@@ -1122,122 +839,7 @@
                             </div>
                         </td>
                     </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Alex</td>
-                        <td>3476537829398</td>
-                        <td>Jln. Mawar</td>
-                        <td>Ibu Hamil</td>
-                        <td>
-                            <div class="action-btns">
-                                <button class="btn-icon btn-view" title="Lihat"><svg width="16" height="16"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                                        stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                                        <circle cx="12" cy="12" r="3" />
-                                    </svg></button>
-                                <button class="btn-icon btn-block" title="Blokir"><svg width="16" height="16"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                                        stroke-linecap="round" stroke-linejoin="round">
-                                        <circle cx="12" cy="12" r="10" />
-                                        <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
-                                    </svg></button>
-                                <button class="btn-icon btn-edit" title="Edit"><svg width="16" height="16"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                                        stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
-                                        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                    </svg></button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>Siti Rahma</td>
-                        <td>3512019845612</td>
-                        <td>Jln. Melati</td>
-                        <td>Balita</td>
-                        <td>
-                            <div class="action-btns">
-                                <button class="btn-icon btn-view" title="Lihat"><svg width="16" height="16"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                                        stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                                        <circle cx="12" cy="12" r="3" />
-                                    </svg></button>
-                                <button class="btn-icon btn-block" title="Blokir"><svg width="16" height="16"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                                        stroke-linecap="round" stroke-linejoin="round">
-                                        <circle cx="12" cy="12" r="10" />
-                                        <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
-                                    </svg></button>
-                                <button class="btn-icon btn-edit" title="Edit"><svg width="16" height="16"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                                        stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
-                                        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                    </svg></button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td>Dewi Kusuma</td>
-                        <td>3578023451289</td>
-                        <td>Jln. Anggrek</td>
-                        <td>Ibu Hamil</td>
-                        <td>
-                            <div class="action-btns">
-                                <button class="btn-icon btn-view" title="Lihat"><svg width="16" height="16"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                                        stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                                        <circle cx="12" cy="12" r="3" />
-                                    </svg></button>
-                                <button class="btn-icon btn-block" title="Blokir"><svg width="16" height="16"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                                        stroke-linecap="round" stroke-linejoin="round">
-                                        <circle cx="12" cy="12" r="10" />
-                                        <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
-                                    </svg></button>
-                                <button class="btn-icon btn-edit" title="Edit"><svg width="16" height="16"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                                        stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
-                                        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                    </svg></button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>5</td>
-                        <td>Rina Wati</td>
-                        <td>3507112367891</td>
-                        <td>Jln. Dahlia</td>
-                        <td>Balita</td>
-                        <td>
-                            <div class="action-btns">
-                                <button class="btn-icon btn-view" title="Lihat"><svg width="16" height="16"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                                        stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                                        <circle cx="12" cy="12" r="3" />
-                                    </svg></button>
-                                <button class="btn-icon btn-block" title="Blokir"><svg width="16" height="16"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                                        stroke-linecap="round" stroke-linejoin="round">
-                                        <circle cx="12" cy="12" r="10" />
-                                        <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
-                                    </svg></button>
-                                <button class="btn-icon btn-edit" title="Edit"><svg width="16" height="16"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                                        stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
-                                        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                    </svg></button>
-                            </div>
-                        </td>
-                    </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>
@@ -1264,8 +866,6 @@
                 <button class="page-btn arrow" onclick="changePage(currentPage+1)">&#8250;</button>
             </div>
         </div>
-
-    </main>
 
     <!-- ══ MODAL CETAK LAPORAN ══ -->
     <div class="modal-overlay" id="printModal">
@@ -1305,47 +905,17 @@
                                     <th>Dusun</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="printTableBody">
+                                @foreach($patients as $index => $d)
                                 <tr>
-                                    <td>1</td>
-                                    <td>Badrul</td>
-                                    <td>009747391</td>
-                                    <td>0877788</td>
-                                    <td>Jln. Nuaasss</td>
-                                    <td>Patrang</td>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ $d->nama }}</td>
+                                    <td>{{ $d->nik }}</td>
+                                    <td>{{ $d->noHp ?? '-' }}</td>
+                                    <td>{{ $d->alamat }}</td>
+                                    <td>{{ $d->dusun ?? '-' }}</td>
                                 </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>Hamidun</td>
-                                    <td>09876678</td>
-                                    <td>08789987635</td>
-                                    <td>Jln. Bakso</td>
-                                    <td>Lalo</td>
-                                </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>Alex</td>
-                                    <td>3476537829398</td>
-                                    <td>08123456789</td>
-                                    <td>Jln. Mawar</td>
-                                    <td>Sumbersari</td>
-                                </tr>
-                                <tr>
-                                    <td>4</td>
-                                    <td>Siti Rahma</td>
-                                    <td>3512019845612</td>
-                                    <td>08234567890</td>
-                                    <td>Jln. Melati</td>
-                                    <td>Kaliwates</td>
-                                </tr>
-                                <tr>
-                                    <td>5</td>
-                                    <td>Dewi Kusuma</td>
-                                    <td>3578023451289</td>
-                                    <td>08345678901</td>
-                                    <td>Jln. Anggrek</td>
-                                    <td>Patrang</td>
-                                </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -1418,6 +988,9 @@
         </div>
     </div>
 
+@endsection
+
+@section('scripts')
     <script>
         // Set print dates
         const now = new Date();
@@ -1443,25 +1016,325 @@
             if (e.target === this) closeModal();
         });
 
-        // Search filter
-        function filterTable() {
-            const q = document.getElementById('searchInput').value.toLowerCase();
-            document.querySelectorAll('#tableBody tr').forEach(r => {
-                r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
-            });
-        }
-
-        // Pagination highlight
+        // Dynamic patient data loaded from database
+        let data = @json($patients);
+        let filtered = [...data];
         let currentPage = 1;
-        function changePage(p) {
-            if (p < 1 || p > 10) return;
-            currentPage = p;
-            [1, 2, 9, 10].forEach(n => {
-                const el = document.getElementById('pg' + n);
-                if (el) el.classList.toggle('active', n === p);
-            });
-        }
-    </script>
-</body>
+        const itemsPerPage = 8;
 
-</html>
+        function applyFilters() {
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            const kat = document.getElementById('katSelect').value;
+            const sort = document.getElementById('sortSelect').value;
+
+            filtered = data.filter(d => {
+                const matchQ = !q || d.nama.toLowerCase().includes(q) || d.nik.includes(q) || (d.alamat && d.alamat.toLowerCase().includes(q));
+                const matchKat = !kat || d.kategori === kat;
+                return matchQ && matchKat;
+            });
+
+            if (sort === 'terbaru') {
+                filtered.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+            } else if (sort === 'terlama') {
+                filtered.sort((a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0));
+            } else if (sort === 'az') {
+                filtered.sort((a, b) => a.nama.localeCompare(b.nama));
+            } else if (sort === 'za') {
+                filtered.sort((a, b) => b.nama.localeCompare(a.nama));
+            }
+
+            currentPage = 1;
+            renderTable();
+            renderPrintTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            const totalItems = filtered.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+            const paginated = filtered.slice(startIndex, endIndex);
+
+            if (totalItems === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: var(--gray-500);"><i class="ti ti-database-off" style="font-size: 2rem; display: block; margin-bottom: 8px;"></i>Tidak ada data pasien ditemukan</td></tr>';
+                renderPagination(totalPages);
+                return;
+            }
+
+            tbody.innerHTML = paginated.map((d, i) => {
+                const kategoriLabel = d.kategori === 'ibu' ? 'Ibu Hamil' : (d.kategori === 'balita' ? 'Balita' : 'Lansia');
+                const rowNo = startIndex + i + 1;
+                return `
+                    <tr onclick="goToForm(${d.id})" style="cursor: pointer;">
+                        <td>${rowNo}</td>
+                        <td style="font-weight: 700; color: var(--gray-900);">${d.nama}</td>
+                        <td style="font-weight: 700; color: var(--gray-900);">${d.nik}</td>
+                        <td>${d.alamat || '-'}</td>
+                        <td>
+                            <span class="badge-kategori ${d.kategori}" style="padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; background: ${d.kategori === 'ibu' ? '#e4f7f5' : '#e8f5ee'}; color: ${d.kategori === 'ibu' ? '#1e9e8c' : '#1a5c38'};">
+                                ${kategoriLabel}
+                            </span>
+                        </td>
+                        <td onclick="event.stopPropagation()">
+                            <div class="action-btns">
+                                <button class="btn-icon btn-view" onclick="lihat(${d.id})" title="Lihat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg></button>
+                                <button class="btn-icon btn-block" onclick="hapus(${d.id})" title="Hapus" style="color: #ef4444;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><line x1="4.93" y1="4.93" x2="19.07" y2="19.07" /></svg></button>
+                                <button class="btn-icon btn-edit" onclick="edit(${d.id})" title="Edit"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" /></svg></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            renderPagination(totalPages);
+        }
+
+        function renderPagination(totalPages) {
+            const paginationWrap = document.querySelector('.pagination');
+            let html = `<button class="page-btn arrow ${currentPage === 1 ? 'disabled' : ''}" onclick="changePage(${currentPage - 1})" style="${currentPage === 1 ? 'opacity: 0.5; pointer-events: none;' : ''}">&#8249;</button>`;
+            
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                    html += `<button class="page-btn ${currentPage === i ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+                } else if (i === 2 || i === totalPages - 1) {
+                    html += `<span class="page-dots">...</span>`;
+                }
+            }
+
+            html += `<button class="page-btn arrow ${currentPage === totalPages ? 'disabled' : ''}" onclick="changePage(${currentPage + 1})" style="${currentPage === totalPages ? 'opacity: 0.5; pointer-events: none;' : ''}">&#8250;</button>`;
+            paginationWrap.innerHTML = html;
+        }
+
+        function changePage(p) {
+            currentPage = p;
+            renderTable();
+        }
+
+        function renderPrintTable() {
+            const tbody = document.getElementById('printTableBody');
+            tbody.innerHTML = filtered.map((d, i) => {
+                return `
+                    <tr>
+                        <td>${i + 1}</td>
+                        <td>${d.nama}</td>
+                        <td>${d.nik}</td>
+                        <td>${d.noHp || '-'}</td>
+                        <td>${d.alamat || '-'}</td>
+                        <td>${d.dusun || '-'}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function edit(id) {
+            const p = data.find(x => x.id === id);
+            if(!p) return;
+            localStorage.setItem('currentPatient', JSON.stringify(p));
+            localStorage.removeItem('langkah1Data');
+            localStorage.removeItem('langkah2Data');
+            localStorage.removeItem('langkah3Data');
+            window.location.href = '/langkah-1';
+        }
+
+        function goToForm(id) {
+            edit(id);
+        }
+
+        async function hapus(id) {
+            if(!confirm("Apakah Anda yakin ingin menghapus data pasien ini?")) return;
+            
+            try {
+                const response = await fetch(`/patients/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    }
+                });
+                if (response.ok) {
+                    alert("Data pasien berhasil dihapus.");
+                    location.reload();
+                } else {
+                    alert("Gagal menghapus data pasien.");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Terjadi kesalahan koneksi.");
+            }
+        }
+
+        async function lihat(id) {
+            const p = data.find(x => x.id === id);
+            if(!p) return;
+
+            const overlay = document.getElementById('detailOverlay');
+            const panel = document.getElementById('detailPanel');
+            const body = document.getElementById('dpBody');
+
+            body.innerHTML = '<div style="padding: 32px; text-align: center; color: var(--gray-500);"><i class="ti ti-loader animate-spin" style="font-size: 24px;"></i><p style="margin-top: 8px;">Mengambil riwayat medis...</p></div>';
+            overlay.classList.remove('hidden');
+            setTimeout(() => panel.classList.remove('translate-x-full'), 10);
+
+            try {
+                const response = await fetch(`/patients/${id}`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+                const detail = await response.json();
+
+                const historyHtml = detail.pemeriksaans.length > 0 
+                    ? detail.pemeriksaans.map((h, hIdx) => {
+                        const accId = `acc-${h.id}`;
+                        const isOpen = hIdx === 0;
+                        
+                        const tindakLanjutHtml = h.tindak_lanjut ? h.tindak_lanjut.map(tl => `
+                            <div style="display: flex; align-items: start; gap: 8px; font-size: 12px; color: var(--gray-700); padding: 2px 0;">
+                                <i class="ti ti-circle-check" style="color: #1e9e8c; font-size: 14px;"></i>
+                                <span>${tl}</span>
+                            </div>
+                        `).join('') : '<p style="font-size: 12px; color: var(--gray-500); font-style: italic;">Tidak ada tindak lanjut</p>';
+
+                        return `
+                        <div style="background: #fff; border: 1px solid var(--gray-100); border-radius: 8px; overflow: hidden; margin-bottom: 12px;" id="${accId}">
+                            <button style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left;" onclick="toggleAcc('${accId}')">
+                                <span style="font-size: 13px; font-weight: 700; color: var(--gray-900);">${new Date(h.tgl_periksa).toLocaleDateString('id-ID')}</span>
+                                <span style="padding: 2px 8px; border-radius: 4px; font-size: 9px; font-weight: 700; text-transform: uppercase; background: ${h.level_risiko === 'rendah' ? '#e8f5ee' : '#fee2e2'}; color: ${h.level_risiko === 'rendah' ? '#1a5c38' : '#ef4444'};">${h.level_risiko}</span>
+                                <i class="ti ti-chevron-down ${isOpen ? 'rotate-180' : ''}" style="font-size: 14px; color: var(--gray-500);"></i>
+                            </button>
+                            <div style="padding: 16px; border-top: 1px solid var(--gray-100); display: ${isOpen ? 'block' : 'none'};">
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                                    <div>
+                                        <span style="font-size: 10px; font-weight: 700; color: var(--gray-500); text-transform: uppercase;">Berat Badan</span>
+                                        <span style="display: block; font-size: 13px; font-weight: 700; color: var(--gray-900);">${h.berat_badan || '-'} kg</span>
+                                    </div>
+                                    <div>
+                                        <span style="font-size: 10px; font-weight: 700; color: var(--gray-500); text-transform: uppercase;">Tinggi Badan</span>
+                                        <span style="display: block; font-size: 13px; font-weight: 700; color: var(--gray-900);">${h.tinggi_badan || '-'} cm</span>
+                                    </div>
+                                    <div>
+                                        <span style="font-size: 10px; font-weight: 700; color: var(--gray-500); text-transform: uppercase;">Tekanan Darah</span>
+                                        <span style="display: block; font-size: 13px; font-weight: 700; color: var(--gray-900);">${h.tekanan_darah || '-'}</span>
+                                    </div>
+                                    <div>
+                                        <span style="font-size: 10px; font-weight: 700; color: var(--gray-500); text-transform: uppercase;">Level Risiko</span>
+                                        <span style="display: block; font-size: 13px; font-weight: 700; color: ${h.level_risiko === 'rendah' ? '#1a5c38' : '#ef4444'}; text-transform: uppercase;">${h.level_risiko}</span>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--gray-100);">
+                                    <span style="font-size: 10px; font-weight: 700; color: var(--gray-900); text-transform: uppercase; display: block; margin-bottom: 6px;">Tindak Lanjut</span>
+                                    ${tindakLanjutHtml}
+                                </div>
+                            </div>
+                        </div>`;
+                    }).join('')
+                    : '<div style="background: #fff; border: 1px solid var(--gray-100); border-radius: 8px; padding: 24px; text-align: center;"><i class="ti ti-notes-off" style="font-size: 24px; opacity: 0.3; display: block; margin-bottom: 8px;"></i><p style="font-size: 12px; color: var(--gray-500);">Belum ada riwayat skrining.</p></div>';
+
+                body.innerHTML = `
+                    <div style="background: #fff; border-radius: 12px; padding: 20px; border: 1px solid var(--gray-100); margin-bottom: 16px; box-shadow: var(--shadow);">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--gray-100);">
+                            <div style="width: 48px; height: 48px; border-radius: 50%; background: #e4f7f5; display: flex; align-items: center; justify-content: center; color: #1e9e8c;">
+                                <i class="ti ti-user" style="font-size: 24px;"></i>
+                            </div>
+                            <div>
+                                <h3 style="font-size: 16px; font-weight: 800; color: var(--gray-900); margin: 0;">${detail.nama}</h3>
+                                <p style="font-size: 10px; font-weight: 700; color: var(--gray-500); margin: 4px 0 0 0; letter-spacing: 0.5px;">${detail.nik}</p>
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div style="display: flex; align-items: center; gap: 6px; color: var(--gray-500); font-size: 12px;">
+                                    <i class="ti ti-map-pin"></i>
+                                    <span>Wilayah</span>
+                                </div>
+                                <span style="font-size: 12px; font-weight: 700; color: var(--gray-900);">${detail.kecamatan || '-'}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div style="display: flex; align-items: center; gap: 6px; color: var(--gray-500); font-size: 12px;">
+                                    <i class="ti ti-phone"></i>
+                                    <span>Kontak</span>
+                                </div>
+                                <span style="font-size: 12px; font-weight: 700; color: var(--gray-900);">${detail.noHp || '-'}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div style="display: flex; align-items: center; gap: 6px; color: var(--gray-500); font-size: 12px;">
+                                    <i class="ti ti-category"></i>
+                                    <span>Kategori</span>
+                                </div>
+                                <span style="padding: 2px 8px; border-radius: 4px; font-size: 9px; font-weight: 700; text-transform: uppercase; background: ${detail.kategori === 'ibu' ? '#e4f7f5' : '#e8f5ee'}; color: ${detail.kategori === 'ibu' ? '#1e9e8c' : '#1a5c38'};">${detail.kategori === 'ibu' ? 'Ibu Hamil' : 'Balita'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="padding: 4px;">
+                        <h3 style="font-size: 14px; font-weight: 800; color: var(--gray-900); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                            <i class="ti ti-history" style="color: #1e9e8c;"></i>
+                            Riwayat Pemeriksaan
+                            <span style="background: rgba(30,158,140,0.1); color: #1e9e8c; font-size: 10px; padding: 2px 6px; border-radius: 10px;">${detail.pemeriksaans.length}</span>
+                        </h3>
+                        <div style="display: flex; flex-direction: column;">
+                            ${historyHtml}
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error(error);
+                body.innerHTML = '<div style="padding: 32px; text-align: center; color: #ef4444;"><i class="ti ti-alert-triangle" style="font-size: 24px;"></i><p style="margin-top: 8px; font-weight: 700;">Gagal memuat data</p></div>';
+            }
+        }
+
+        function toggleAcc(id) {
+            const el = document.getElementById(id);
+            const body = el.querySelector('div:last-child');
+            const arrow = el.querySelector('i.ti-chevron-down');
+            const isHidden = body.style.display === 'none';
+            
+            if (isHidden) {
+                body.style.display = 'block';
+                arrow.classList.add('rotate-180');
+            } else {
+                body.style.display = 'none';
+                arrow.classList.remove('rotate-180');
+            }
+        }
+
+        function closeDetailPanel() {
+            const panel = document.getElementById('detailPanel');
+            panel.classList.add('translate-x-full');
+            setTimeout(() => document.getElementById('detailOverlay').classList.add('hidden'), 300);
+        }
+
+        // Close on overlay click
+        function handleOverlayClick(e) {
+            if (e.target.id === 'detailOverlay') closeDetailPanel();
+        }
+
+        // Initial table load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTable();
+        });
+    </script>
+    <!-- ══ DETAIL OVERLAY & SIDE-PANEL ══ -->
+    <div id="detailOverlay" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 200; backdrop-filter: blur(4px); transition: opacity 0.3s;" onclick="handleOverlayClick(event)">
+        <div id="detailPanel" class="translate-x-full" style="position: fixed; right: 0; top: 0; bottom: 0; width: 460px; background: #f7f9f8; box-shadow: -4px 0 24px rgba(0,0,0,0.15); z-index: 210; transition: transform 0.3s ease; display: flex; flex-direction: column;">
+            <!-- Header -->
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; background: #fff; border-bottom: 1px solid var(--gray-100);">
+                <h2 style="font-size: 16px; font-weight: 800; color: var(--gray-900); display: flex; align-items: center; gap: 8px; margin: 0;">
+                    <i class="ti ti-id-badge-2" style="color: #1e9e8c; font-size: 20px;"></i>
+                    Detail Rekam Medis
+                </h2>
+                <button style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #f3f4f6; border: none; cursor: pointer;" onclick="closeDetailPanel()">
+                    <i class="ti ti-x" style="font-size: 16px; color: var(--gray-700);"></i>
+                </button>
+            </div>
+            
+            <!-- Body -->
+            <div style="flex: 1; overflow-y: auto; padding: 24px;" id="dpBody">
+                <!-- Dynamic Content -->
+            </div>
+        </div>
+    </div>
+@endsection
