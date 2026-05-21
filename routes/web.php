@@ -165,11 +165,27 @@ Route::get('/login',  [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout',[AuthController::class, 'logout'])->name('logout');
 
-Route::get('/daftar',   [AuthController::class, 'showRegister']);
-Route::get('/register', [AuthController::class, 'showRegister']);
-Route::post('/register',[AuthController::class, 'register']);
 
 Route::get('/forgot-password', fn() => view('auth.forgot-password'));
+Route::post('/forgot-password/send',   [AuthController::class, 'sendResetCode']);
+Route::post('/forgot-password/verify', [AuthController::class, 'verifyResetCode']);
+Route::post('/forgot-password/reset',  [AuthController::class, 'resetPassword']);
+Route::get('/run-migrate', function() {
+    try {
+        if (!\Illuminate\Support\Facades\Schema::hasTable('password_reset_tokens')) {
+            \Illuminate\Support\Facades\Schema::create('password_reset_tokens', function ($table) {
+                $table->string('email')->primary();
+                $table->string('token');
+                $table->timestamp('created_at')->nullable();
+            });
+            return "Table 'password_reset_tokens' successfully created!";
+        }
+        return "Table 'password_reset_tokens' already exists!";
+    } catch(\Exception $e) {
+        return "Error: " . $e->getMessage();
+    }
+});
+
 
 /* ══════════════════════════════════════════════════
    PROTECTED – Petugas & Admin (harus login)
@@ -182,11 +198,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/sasaran',   fn() => view('petugas.sasaran'));
 
     /* ── 1.0 Kelola Data Pasien ── */
-    Route::get('/list_data_pasien',       [PatientController::class, 'index']);
-    Route::post('/patients',              [PatientController::class, 'store']);
-    Route::get('/patients/{patient}',     [PatientController::class, 'show']);
-    Route::put('/patients/{patient}',     [PatientController::class, 'update']);
-    Route::delete('/patients/{patient}',  [PatientController::class, 'destroy']);
+    Route::get('/list_data_pasien',           [PatientController::class, 'index']);
+    Route::post('/patients',                  [PatientController::class, 'store']);
+    Route::get('/patients/{patient}',         [PatientController::class, 'show']);
+    Route::get('/patients/{patient}/edit',    [PatientController::class, 'edit']);
+    Route::put('/patients/{patient}',         [PatientController::class, 'update']);
+    Route::patch('/patients/{patient}',       [PatientController::class, 'update']);
+    Route::delete('/patients/{patient}',      [PatientController::class, 'destroy']);
 
     // Legacy view routes
     Route::get('/data_pasien', function() {

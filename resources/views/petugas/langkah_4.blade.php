@@ -33,12 +33,12 @@
   .table-wrapper{border:2px solid #c8d5e0;border-radius:8px;overflow:hidden;flex:1}
   .data-table{width:100%;border-collapse:collapse}
   .data-table thead tr{background:var(--teal);color:#fff}
-  .data-table th{padding:11px 13px;font-size:12px;font-weight:700;text-align:left}
-  .data-table td{padding:12px 13px;font-size:12px;color:var(--text)}
+  .data-table th{padding:12px 14px;font-size:12px;font-weight:700;text-align:left;border-bottom:2px solid #c8d5e0}
+  .data-table td{padding:14px;font-size:12px;color:var(--text);border-bottom:1.5px solid #c8d5e0}
   .data-table tbody tr:hover{background:#f0fffe}
 
   /* RIGHT */
-  .right-panel{flex:1;border:2px solid #c8d5e0;border-radius:12px;padding:22px;display:flex;flex-direction:column;gap:12px;margin-top:72px;min-height:480px}
+  .right-panel{flex:1;border:2px solid #c8d5e0;border-radius:12px;padding:22px;display:flex;flex-direction:column;gap:12px;min-height:480px}
   .panel-title{background:var(--teal);color:#fff;border-radius:8px;padding:11px 16px;font-size:13px;font-weight:700;letter-spacing:.5px;text-align:center;width:100%}
 
   /* RISK BADGE */
@@ -51,9 +51,9 @@
   .risk-icon{font-size:22px}
 
   /* SCORE ROW */
-  .score-row{display:flex;gap:10px}
+  .score-row{display:flex;gap:10px;margin-top:12px;margin-bottom:12px}
   .score-box{flex:1;background:#f7fafd;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;text-align:center}
-  .score-box .s-num{font-size:22px;font-weight:800}
+  .score-box .s-num{font-size:22px;font-weight:800;}
   .score-box .s-label{font-size:10px;font-weight:600;color:#7a8ba0;margin-top:2px}
   .score-box.c-green .s-num{color:var(--green)}
   .score-box.c-yellow .s-num{color:var(--yellow)}
@@ -81,7 +81,7 @@
 </style>
 </head>
 <body>
-<div class="topbar"></div>
+@include('layouts.header_step')
 
 <!-- STEPPER -->
 <div class="stepper-wrapper">
@@ -121,9 +121,7 @@
   <div class="card">
     <!-- LEFT -->
     <div class="left-panel">
-      <div class="avatar-circle">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
-      </div>
+
       <div class="table-wrapper">
         <table class="data-table">
           <thead>
@@ -140,13 +138,6 @@
     <div class="right-panel">
       <div class="panel-title" id="panelTitle">HASIL & TINDAK LANJUT SKRINING</div>
 
-      <!-- Patient Summary Header -->
-      <div id="patientSummary" style="background: #f7fafd; border: 1.5px solid var(--border); border-radius: 8px; padding: 12px 16px; margin-bottom: 4px; flex-shrink: 0;">
-        <div style="font-size: 13px; font-weight: 700; color: var(--text);" id="sum-nama">-</div>
-        <div style="font-size: 11px; font-weight: 600; color: #7a8ba0; margin-top: 2px;">
-          NIK: <span id="sum-nik">-</span> &bull; Kategori: <span id="sum-kategori">-</span>
-        </div>
-      </div>
 
       <div id="resultArea"><p style="text-align:center;color:#999">Menghitung skor...</p></div>
       <div class="form-actions">
@@ -264,10 +255,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <td>${p.tglKunjungan||'-'}</td><td>${katLabel}</td>
     </tr>`;
 
-  // Populate patient summary
-  document.getElementById('sum-nama').textContent = p.nama || '-';
-  document.getElementById('sum-nik').textContent = p.nik || '-';
-  document.getElementById('sum-kategori').textContent = katLabel;
+
 
   const area = document.getElementById('resultArea');
 
@@ -363,6 +351,17 @@ async function selesai() {
   const l2 = JSON.parse(localStorage.getItem('langkah2Data') || '{}');
   const l3 = JSON.parse(localStorage.getItem('langkah3Data') || '{}');
 
+  // Calculate skor_ya based on kategori
+  let skorYa = 0;
+  if (p.kategori === 'ibu') {
+    const keys = ['q1','q2','q3','q4','q5','q6','q7','q8','q9','q10'];
+    skorYa = keys.filter(k => l3[k] === 'ya').length;
+  } else if (p.kategori === 'balita') {
+    const sKeys = ['s1','s2','s3','s4','s5','s6'];
+    const pKeys = ['p1','p2','p3','p4','p5','p6'];
+    skorYa = sKeys.filter(k => l3[k] === 'ya').length + pKeys.filter(k => l3[k] === 'ya').length;
+  }
+
   const payload = {
     patient_id: p.id,
     tgl_periksa: l1.tgl_periksa,
@@ -377,6 +376,7 @@ async function selesai() {
     imunisasi: l2.imunisasi || null,
     jawaban_skrining: l3,
     level_risiko: levelRisikoGlobal,
+    skor_ya: skorYa,
     tindak_lanjut: tindakLanjutGlobal,
     catatan: `Skrining otomatis: ${levelRisikoGlobal.toUpperCase()}`
   };

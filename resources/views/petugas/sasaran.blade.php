@@ -242,7 +242,8 @@
                             <option value="">Pilih Kategori</option>
                             <option value="ibu_hamil">Ibu Hamil</option>
                             <option value="ibu_menyusui">Ibu Menyusui</option>
-                            <option value="anak">Anak</option>
+                            <option value="balita">Balita</option>
+                            <option value="lansia">Lansia</option>
                         </select>
                     </div>
                     <div class="btn-wrap">

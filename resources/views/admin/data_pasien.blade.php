@@ -666,6 +666,10 @@
 
         /* print media — only show the paper */
         @media print {
+            @page {
+                margin: 1cm;
+            }
+
             body * {
                 visibility: hidden;
             }
@@ -676,21 +680,47 @@
             }
 
             .modal-paper {
-                position: fixed;
-                inset: 0;
-                width: 100vw;
-                box-shadow: none;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                border: none !important;
             }
 
             .modal-overlay,
             .modal-box {
+                position: static !important;
                 display: block !important;
                 background: none !important;
                 box-shadow: none !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                height: auto !important;
+                max-height: none !important;
+                overflow: visible !important;
+            }
+
+            .modal-paper-wrap {
+                overflow: visible !important;
+                padding: 0 !important;
+            }
+
+            .print-table-wrap {
+                overflow: visible !important;
+                margin: 0 !important;
+            }
+
+            .print-table {
+                width: 100% !important;
+                min-width: 100% !important;
             }
 
             .modal-settings {
-                display: none;
+                display: none !important;
             }
         }
         .hidden {
@@ -698,6 +728,101 @@
         }
         .translate-x-full {
             transform: translateX(100%) !important;
+        }
+
+        /* ── UNIFIED TOOLBAR & CUSTOM DROPDOWNS ── */
+        .btn-tambah {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 16px;
+            background-color: var(--green-mid);
+            color: #fff;
+            font-size: 0.88rem;
+            font-weight: 700;
+            border-radius: 10px;
+            box-shadow: 0 4px 14px rgba(14, 118, 109, 0.1);
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-tambah:hover {
+            background-color: var(--green-dark);
+            transform: translateY(-1px);
+        }
+        .dd-trigger {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            min-width: 140px;
+            border: 1.5px solid #e0ebe9;
+            border-radius: 10px;
+            background-color: #fff;
+            cursor: pointer;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        .dd-trigger:hover {
+            border-color: var(--green-light);
+            box-shadow: 0 0 0 3px rgba(61, 171, 106, 0.08);
+        }
+        .search-input {
+            padding-left: 36px;
+            padding-right: 16px;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            border: 1.5px solid #e0ebe9;
+            border-radius: 10px;
+            background-color: #fff;
+            color: var(--gray-900);
+            font-size: 0.87rem;
+            outline: none;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            transition: all 0.2s ease;
+        }
+        .search-input:focus {
+            border-color: var(--green-light);
+            box-shadow: 0 0 0 3px rgba(61, 171, 106, 0.1);
+        }
+        .btn-apply {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background-color: var(--green-mid);
+            color: #fff;
+            font-size: 0.87rem;
+            font-weight: 700;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(14,118,109,0.2);
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-apply:hover {
+            background-color: var(--green-dark);
+            transform: translateY(-1px);
+        }
+        .btn-reset-custom {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            background-color: #fff;
+            border: 1px solid #eef2f0;
+            color: #888;
+            font-size: 0.87rem;
+            font-weight: 700;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-reset-custom:hover {
+            border-color: var(--green-light);
+            color: var(--green-mid);
         }
     </style>
 
@@ -707,7 +832,7 @@
             <h1 class="text-[36px] font-extrabold text-pos-gray-900 leading-none">Data Pasien</h1>
         </div>
         <div class="admin-badge flex items-center gap-3 bg-white border border-pos-gray-100 rounded-full px-4 py-2 shadow-pos-shadow">
-            <img class="w-10 h-10 rounded-full object-cover border border-pos-green-light" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&h=80&q=80" alt="Admin" />
+            <img class="w-10 h-10 rounded-full object-cover border border-pos-green-light" src="{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&h=80&q=80' }}" alt="Admin" />
             <div class="text-left">
                 <p class="text-xs font-bold leading-none text-pos-gray-900">{{ Auth::user()->name }}</p>
                 <p class="text-[9px] font-bold text-pos-gray-500 uppercase tracking-widest mt-1">{{ Auth::user()->role }}</p>
@@ -715,35 +840,66 @@
         </div>
     </div>
 
-        <!-- Filter -->
-        <div class="filter-row">
-            <div class="select-wrap">
-                <select id="katSelect" onchange="applyFilters()">
-                    <option value="">Kategori</option>
-                    <option value="ibu">Ibu Hamil</option>
-                    <option value="balita">Balita</option>
-                </select>
-            </div>
-            <div class="select-wrap">
-                <select id="sortSelect" onchange="applyFilters()">
-                    <option value="">Filter</option>
-                    <option value="terbaru">Terbaru</option>
-                    <option value="terlama">Terlama</option>
-                    <option value="az">A–Z</option>
-                    <option value="za">Z-A</option>
-                </select>
-            </div>
+    <!-- Unified Toolbar (Info, Filters) -->
+    <div class="bg-white border border-pos-gray-100 rounded-2xl shadow-pos-shadow p-3.5 mb-6 flex flex-wrap lg:flex-nowrap items-center justify-between gap-3 w-full">
+        <!-- Left Section: Info Count -->
+        <div class="flex items-center gap-4 shrink-0 w-full lg:w-auto">
+            <span class="text-[0.87rem] text-pos-gray-500 font-bold whitespace-nowrap" id="infoCount">Menampilkan 0 dari 0 data</span>
         </div>
 
-        <!-- Search -->
-        <div class="search-wrap">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-            <input type="text" placeholder="Search user" id="searchInput" oninput="applyFilters()" />
+        <!-- Right Section: Filters -->
+        <div class="flex items-center gap-2 grow justify-end w-full lg:w-auto">
+            <!-- Dropdown: Kategori -->
+            <div class="relative select-none shrink-0" id="ddKategori">
+                    <div class="dd-trigger !min-w-[125px]" onclick="toggleDD('ddKategori')">
+                        <i class="ti ti-category text-pos-teal text-base" style="color: var(--green-mid);"></i>
+                        <span class="grow font-semibold text-[0.87rem] text-pos-gray-900" id="ddKatLabel">Semua Kategori</span>
+                        <svg class="text-pos-gray-500 shrink-0 transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m19 9-7 7-7-7"/></svg>
+                    </div>
+                    <div class="hidden absolute top-[calc(100%+8px)] left-0 min-w-full bg-white border-[1.5px] border-pos-gray-100 rounded-xl shadow-[0_8px_28px_rgba(0,0,0,0.1)] overflow-hidden z-50">
+                        <div class="px-[14px] py-[10px] text-[0.86rem] font-medium text-pos-gray-900 cursor-pointer hover:bg-pos-green-pale hover:text-pos-green-dark transition-colors active" data-val="" data-label="Semua Kategori" onclick="pickKat(this)">Semua Kategori</div>
+                        <div class="h-px bg-pos-gray-100 my-1"></div>
+                        <div class="px-[14px] py-[10px] text-[0.86rem] font-medium text-pos-gray-900 cursor-pointer hover:bg-pos-green-pale hover:text-pos-green-dark transition-colors" data-val="ibu" data-label="Ibu Hamil" onclick="pickKat(this)">Ibu Hamil</div>
+                        <div class="px-[14px] py-[10px] text-[0.86rem] font-medium text-pos-gray-900 cursor-pointer hover:bg-pos-green-pale hover:text-pos-green-dark transition-colors" data-val="balita" data-label="Balita" onclick="pickKat(this)">Balita</div>
+                        <div class="px-[14px] py-[10px] text-[0.86rem] font-medium text-pos-gray-900 cursor-pointer hover:bg-pos-green-pale hover:text-pos-green-dark transition-colors" data-val="lansia" data-label="Lansia" onclick="pickKat(this)">Lansia</div>
+                    </div>
+                </div>
+
+                <!-- Dropdown: Urutkan -->
+                <div class="relative select-none" id="ddSort">
+                    <div class="dd-trigger !min-w-[110px]" onclick="toggleDD('ddSort')">
+                        <i class="ti ti-arrows-sort text-pos-teal text-base" style="color: var(--green-mid);"></i>
+                        <span class="grow font-semibold text-[0.87rem] text-pos-gray-900" id="ddSortLabel">Urutkan</span>
+                        <svg class="text-pos-gray-500 shrink-0 transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m19 9-7 7-7-7"/></svg>
+                    </div>
+                    <div class="hidden absolute top-[calc(100%+8px)] left-0 min-w-full bg-white border-[1.5px] border-pos-gray-100 rounded-xl shadow-[0_8px_28px_rgba(0,0,0,0.1)] overflow-hidden z-50">
+                        <div class="px-[14px] py-[10px] text-[0.86rem] font-medium text-pos-gray-900 cursor-pointer hover:bg-pos-green-pale hover:text-pos-green-dark transition-colors active" data-val="" data-label="Urutkan" onclick="pickSort(this)">Default</div>
+                        <div class="h-px bg-pos-gray-100 my-1"></div>
+                        <div class="px-[14px] py-[10px] text-[0.86rem] font-medium text-pos-gray-900 cursor-pointer hover:bg-pos-green-pale hover:text-pos-green-dark transition-colors" data-val="terbaru" data-label="Terbaru" onclick="pickSort(this)">Terbaru</div>
+                        <div class="px-[14px] py-[10px] text-[0.86rem] font-medium text-pos-gray-900 cursor-pointer hover:bg-pos-green-pale hover:text-pos-green-dark transition-colors" data-val="terlama" data-label="Terlama" onclick="pickSort(this)">Terlama</div>
+                        <div class="px-[14px] py-[10px] text-[0.86rem] font-medium text-pos-gray-900 cursor-pointer hover:bg-pos-green-pale hover:text-pos-green-dark transition-colors" data-val="nama" data-label="Nama A–Z" onclick="pickSort(this)">Nama A–Z</div>
+                        <div class="px-[14px] py-[10px] text-[0.86rem] font-medium text-pos-gray-900 cursor-pointer hover:bg-pos-green-pale hover:text-pos-green-dark transition-colors" data-val="nik" data-label="NIK" onclick="pickSort(this)">NIK</div>
+                    </div>
+                </div>
+
+            <!-- Search -->
+            <div class="relative grow max-w-[180px] min-w-[130px]">
+                <i class="ti ti-search absolute text-pos-gray-500 text-base pointer-events-none" style="left: 12px; top: 50%; transform: translateY(-50%); position: absolute;"></i>
+                <input type="text" id="searchInput" class="search-input !w-full" placeholder="Cari nama, NIK..." style="padding-left: 36px; width: 100%;" />
+            </div>
+
+            <!-- Right: Action Buttons -->
+            <!-- Tombol Terapkan -->
+            <button onclick="applyFilter()" class="btn-apply shrink-0">
+                <i class="ti ti-filter text-base"></i> Terapkan
+            </button>
+
+            <!-- Tombol Reset -->
+            <button onclick="resetFilter()" class="btn-reset-custom hidden shrink-0" id="btnReset">
+                <i class="ti ti-x text-base"></i> Reset
+            </button>
         </div>
+    </div>
 
         <!-- Stat Cards -->
         <div class="stats-row grid grid-cols-3 gap-5 mb-7">
@@ -808,8 +964,8 @@
                     @foreach($patients as $index => $d)
                     <tr onclick="goToForm({{ $d->id }})" style="cursor: pointer;">
                         <td>{{ $index + 1 }}</td>
-                        <td style="font-weight: 700; color: var(--gray-900);">{{ $d->nama }}</td>
-                        <td style="font-weight: 700; color: var(--gray-900);">{{ $d->nik }}</td>
+                        <td>{{ $d->nama }}</td>
+                        <td>{{ $d->nik }}</td>
                         <td>{{ $d->alamat }}</td>
                         <td>
                             <span class="badge-kategori {{ $d->kategori }}" style="padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; background: {{ $d->kategori === 'ibu' ? '#e4f7f5' : '#e8f5ee' }}; color: {{ $d->kategori === 'ibu' ? '#1e9e8c' : '#1a5c38' }};">
@@ -845,8 +1001,9 @@
         </div>
 
         <!-- Bottom row -->
-        <div class="bottom-row">
-            <button class="btn-print" onclick="openPrintModal()">
+        <div class="bottom-row flex items-center justify-between flex-wrap gap-4 mt-6">
+            <!-- Left: Cetak laporan -->
+            <button class="btn-print shrink-0" onclick="openPrintModal()">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
                     stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="6 9 6 2 18 2 18 9" />
@@ -856,16 +1013,136 @@
                 Cetak laporan
             </button>
 
-            <div class="pagination">
-                <button class="page-btn arrow" onclick="changePage(currentPage-1)">&#8249;</button>
-                <button class="page-btn active" id="pg1" onclick="changePage(1)">1</button>
-                <button class="page-btn" id="pg2" onclick="changePage(2)">2</button>
-                <span class="page-dots">...</span>
-                <button class="page-btn" id="pg9" onclick="changePage(9)">9</button>
-                <button class="page-btn" id="pg10" onclick="changePage(10)">10</button>
-                <button class="page-btn arrow" onclick="changePage(currentPage+1)">&#8250;</button>
+            <!-- Right: Limit & Pagination -->
+            <div class="flex items-center gap-6 flex-wrap">
+                <!-- Limit Selector -->
+                <div class="flex items-center gap-2">
+                    <span class="text-[13px] font-bold text-pos-gray-500">Tampilkan:</span>
+                    <div class="relative flex items-center group">
+                        <select id="limitSelect" onchange="changeLimit(this.value)" class="h-9 pl-3.5 pr-8 border-[1.5px] border-pos-gray-300 rounded-lg bg-white text-[13px] font-bold text-pos-gray-700 outline-none focus:border-pos-teal cursor-pointer transition-all hover:border-pos-teal hover:text-pos-teal appearance-none shadow-sm" style="min-width: 90px; appearance: none; padding-right: 28px;">
+                            <option value="5">5 data</option>
+                            <option value="10">10 data</option>
+                            <option value="20">20 data</option>
+                        </select>
+                        <svg class="absolute right-2.5 text-pos-gray-500 pointer-events-none w-3.5 h-3.5 transition-colors duration-200 group-hover:text-pos-teal" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" style="width: 12px; height: 12px;"><path stroke-linecap="round" stroke-linejoin="round" d="m19 9-7 7-7-7"/></svg>
+                    </div>
+                </div>
+
+                <div class="pagination" id="paginationWrap"></div>
             </div>
         </div>
+
+    <!-- ══ MODAL EDIT PASIEN ══ -->
+    <div class="hidden fixed inset-0 bg-black/50 z-[300] items-center justify-center backdrop-blur-[4px]" id="editOverlay">
+        <div class="bg-white rounded-[20px] w-full max-w-[620px] shadow-[0_24px_64px_rgba(0,0,0,0.22)] overflow-hidden" style="font-family: inherit;">
+            <!-- Header -->
+            <div style="background: linear-gradient(135deg, #0E766D, #0A5C55); padding: 22px 28px; display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                        <i class="ti ti-edit" style="color: #fff; font-size: 18px;"></i>
+                    </div>
+                    <div>
+                        <h2 style="color: #fff; font-size: 17px; font-weight: 800; margin: 0;">Edit Data Pasien</h2>
+                        <p style="color: rgba(255,255,255,0.7); font-size: 11px; margin: 2px 0 0; font-weight: 600;">Perbarui informasi data pasien</p>
+                    </div>
+                </div>
+                <button onclick="closeEditModal()" style="background: rgba(255,255,255,0.15); border: none; border-radius: 8px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #fff; font-size: 18px; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">✕</button>
+            </div>
+
+            <!-- Body -->
+            <div style="padding: 28px; max-height: 70vh; overflow-y: auto;">
+                <input type="hidden" id="editId" />
+
+                <!-- Alert -->
+                <div id="editAlert" style="display: none; padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; margin-bottom: 20px;"></div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <!-- Nama -->
+                    <div style="grid-column: span 2;">
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: #0E766D; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">Nama Lengkap <span style="color:#ef4444">*</span></label>
+                        <input type="text" id="editNama" placeholder="Nama lengkap pasien" style="width: 100%; padding: 11px 14px; border: 1.5px solid #e0ebe9; border-radius: 10px; font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.2s; box-sizing: border-box;" onfocus="this.style.borderColor='#0E766D'" onblur="this.style.borderColor='#e0ebe9'" />
+                    </div>
+
+                    <!-- NIK -->
+                    <div>
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: #0E766D; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">NIK <span style="color:#ef4444">*</span></label>
+                        <input type="text" id="editNik" placeholder="16 digit NIK" maxlength="16" style="width: 100%; padding: 11px 14px; border: 1.5px solid #e0ebe9; border-radius: 10px; font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.2s; box-sizing: border-box;" onfocus="this.style.borderColor='#0E766D'" onblur="this.style.borderColor='#e0ebe9'" />
+                    </div>
+
+                    <!-- No HP -->
+                    <div>
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: #0E766D; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">No. HP</label>
+                        <input type="text" id="editNoHp" placeholder="08xx-xxxx-xxxx" style="width: 100%; padding: 11px 14px; border: 1.5px solid #e0ebe9; border-radius: 10px; font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.2s; box-sizing: border-box;" onfocus="this.style.borderColor='#0E766D'" onblur="this.style.borderColor='#e0ebe9'" />
+                    </div>
+
+                    <!-- Kategori -->
+                    <div>
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: #0E766D; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">Kategori <span style="color:#ef4444">*</span></label>
+                        <select id="editKategori" style="width: 100%; padding: 11px 14px; border: 1.5px solid #e0ebe9; border-radius: 10px; font-size: 14px; font-family: inherit; outline: none; background: #fff; cursor: pointer; box-sizing: border-box;">
+                            <option value="ibu">Ibu Hamil</option>
+                            <option value="balita">Balita</option>
+                            <option value="lansia">Lansia</option>
+                        </select>
+                    </div>
+
+                    <!-- Anak ke -->
+                    <div>
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: #0E766D; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">Anak Ke</label>
+                        <input type="number" id="editAnakKe" min="1" placeholder="1" style="width: 100%; padding: 11px 14px; border: 1.5px solid #e0ebe9; border-radius: 10px; font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.2s; box-sizing: border-box;" onfocus="this.style.borderColor='#0E766D'" onblur="this.style.borderColor='#e0ebe9'" />
+                    </div>
+
+                    <!-- Alamat -->
+                    <div style="grid-column: span 2;">
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: #0E766D; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">Alamat <span style="color:#ef4444">*</span></label>
+                        <textarea id="editAlamat" placeholder="Jl. ..." rows="2" style="width: 100%; padding: 11px 14px; border: 1.5px solid #e0ebe9; border-radius: 10px; font-size: 14px; font-family: inherit; outline: none; resize: vertical; transition: border-color 0.2s; box-sizing: border-box;" onfocus="this.style.borderColor='#0E766D'" onblur="this.style.borderColor='#e0ebe9'"></textarea>
+                    </div>
+
+                    <!-- Dusun -->
+                    <div>
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: #0E766D; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">Dusun <span style="color:#ef4444">*</span></label>
+                        <input type="text" id="editDusun" placeholder="Nama dusun" style="width: 100%; padding: 11px 14px; border: 1.5px solid #e0ebe9; border-radius: 10px; font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.2s; box-sizing: border-box;" onfocus="this.style.borderColor='#0E766D'" onblur="this.style.borderColor='#e0ebe9'" />
+                    </div>
+
+                    <!-- Kecamatan -->
+                    <div>
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: #0E766D; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">Kecamatan <span style="color:#ef4444">*</span></label>
+                        <input type="text" id="editKecamatan" placeholder="Nama kecamatan" style="width: 100%; padding: 11px 14px; border: 1.5px solid #e0ebe9; border-radius: 10px; font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.2s; box-sizing: border-box;" onfocus="this.style.borderColor='#0E766D'" onblur="this.style.borderColor='#e0ebe9'" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div style="padding: 18px 28px; border-top: 1px solid #e0ebe9; display: flex; gap: 12px; justify-content: flex-end; background: #f7f9f8;">
+                <button onclick="closeEditModal()" style="padding: 11px 22px; border: 1.5px solid #c4d0ca; border-radius: 10px; background: #fff; font-size: 13px; font-weight: 700; color: #7a9186; cursor: pointer; font-family: inherit; transition: all 0.2s;" onmouseover="this.style.borderColor='#0E766D';this.style.color='#0E766D'" onmouseout="this.style.borderColor='#c4d0ca';this.style.color='#7a9186'">Batal</button>
+                <button id="editSaveBtn" onclick="saveEdit()" style="padding: 11px 28px; border: none; border-radius: 10px; background: linear-gradient(135deg, #0E766D, #0A5C55); color: #fff; font-size: 13px; font-weight: 800; cursor: pointer; font-family: inherit; box-shadow: 0 4px 14px rgba(14,118,109,0.3); transition: all 0.2s; display: flex; align-items: center; gap: 8px;">
+                    <i class="ti ti-device-floppy"></i> Simpan Perubahan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUP PILIH KATEGORI -->
+    <div class="hidden fixed inset-0 bg-black/45 z-[200] items-center justify-center backdrop-blur-[4px] animate-[fadeIn_0.2s_ease]" id="katOverlay" onclick="if(event.target===this) { this.classList.add('hidden'); this.classList.remove('flex'); }">
+        <div class="bg-white rounded-[20px] p-9 pb-10 w-full max-w-[480px] shadow-[0_24px_64px_rgba(0,0,0,0.22)] animate-[slideUp_0.28s_cubic-bezier(0.22,0.68,0,1.2)] relative" style="font-family: inherit;">
+            <button class="absolute top-4 right-[18px] bg-none border-none text-[1.3rem] text-pos-gray-500 hover:text-pos-gray-900 transition-colors leading-none cursor-pointer" onclick="document.getElementById('katOverlay').classList.add('hidden'); document.getElementById('katOverlay').classList.remove('flex');" style="background: none; border: none;">✕</button>
+            <h2 class="text-[1.1rem] font-extrabold text-pos-gray-900 mb-[6px] text-center">Pilih Kategori Pasien</h2>
+            <p class="text-[0.84rem] text-pos-gray-500 text-center mb-7">Pilih kategori untuk melanjutkan pendaftaran</p>
+            <div class="flex gap-[14px] justify-center">
+                <button onclick="openForm('ibu')" class="flex-1 max-w-[130px] bg-pos-gray-50 border-2 border-pos-gray-100 rounded-[16px] p-[22px_14px_18px] flex flex-col items-center gap-[10px] cursor-pointer no-underline transition-all hover:border-pos-teal hover:bg-white hover:-translate-y-1 hover:shadow-[0_10px_28px_rgba(14,118,109,0.15)] group" style="background: var(--gray-50); border: 2px solid var(--gray-100);">
+                    <div class="w-[52px] h-[52px] rounded-[14px] bg-[#d4eeeb] flex items-center justify-center text-[1.6rem] transition-colors group-hover:bg-pos-teal">
+                        <span class="group-hover:brightness-[10]">🤰</span>
+                    </div>
+                    <div class="text-[0.88rem] font-bold text-pos-gray-900 text-center">Ibu Hamil</div>
+                </button>
+                <button onclick="openForm('balita')" class="flex-1 max-w-[130px] bg-pos-gray-50 border-2 border-pos-gray-100 rounded-[16px] p-[22px_14px_18px] flex flex-col items-center gap-[10px] cursor-pointer no-underline transition-all hover:border-pos-teal hover:bg-white hover:-translate-y-1 hover:shadow-[0_10px_28px_rgba(14,118,109,0.15)] group" style="background: var(--gray-50); border: 2px solid var(--gray-100);">
+                    <div class="w-[52px] h-[52px] rounded-[14px] bg-[#d4eeeb] flex items-center justify-center text-[1.6rem] transition-colors group-hover:bg-pos-teal">
+                        <span class="group-hover:brightness-[10]">👶</span>
+                    </div>
+                    <div class="text-[0.88rem] font-bold text-pos-gray-900 text-center">Balita</div>
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- ══ MODAL CETAK LAPORAN ══ -->
     <div class="modal-overlay" id="printModal">
@@ -1020,45 +1297,140 @@
         let data = @json($patients);
         let filtered = [...data];
         let currentPage = 1;
-        const itemsPerPage = 8;
+        let pageSize = 5;
+        let currentKat = '';
+        let currentSort = '';
 
-        function applyFilters() {
-            const q = document.getElementById('searchInput').value.toLowerCase();
-            const kat = document.getElementById('katSelect').value;
-            const sort = document.getElementById('sortSelect').value;
+        window.toggleDD = function(id) {
+            const dd = document.getElementById(id).querySelector('div:last-child');
+            const svg = document.getElementById(id).querySelector('svg');
+            const isHidden = dd.classList.contains('hidden');
+            document.querySelectorAll('[id^="dd"] div:last-child').forEach(d => d.classList.add('hidden'));
+            document.querySelectorAll('[id^="dd"] svg').forEach(s => s.classList.remove('rotate-180'));
+            if(isHidden) { dd.classList.remove('hidden'); svg.classList.add('rotate-180'); }
+        };
 
+        window.pickKat = function(el) {
+            currentKat = el.dataset.val;
+            document.getElementById('ddKatLabel').textContent = el.dataset.label;
+            document.querySelectorAll('#ddKategori div:last-child div').forEach(d => {
+                d.classList.remove('active', 'bg-pos-green-pale', 'text-pos-green-dark', 'font-bold');
+            });
+            el.classList.add('active', 'bg-pos-green-pale', 'text-pos-green-dark', 'font-bold');
+            
+            // Close dropdown
+            document.querySelectorAll('[id^="dd"] div:last-child').forEach(d => d.classList.add('hidden'));
+            document.querySelectorAll('[id^="dd"] svg').forEach(s => s.classList.remove('rotate-180'));
+        };
+
+        window.pickSort = function(el) {
+            currentSort = el.dataset.val;
+            document.getElementById('ddSortLabel').textContent = el.dataset.label;
+            document.querySelectorAll('#ddSort div:last-child div').forEach(d => {
+                d.classList.remove('active', 'bg-pos-green-pale', 'text-pos-green-dark', 'font-bold');
+            });
+            el.classList.add('active', 'bg-pos-green-pale', 'text-pos-green-dark', 'font-bold');
+            
+            // Close dropdown
+            document.querySelectorAll('[id^="dd"] div:last-child').forEach(d => d.classList.add('hidden'));
+            document.querySelectorAll('[id^="dd"] svg').forEach(s => s.classList.remove('rotate-180'));
+        };
+
+        window.onclick = function(event) {
+            if (!event.target.closest('.select-none')) {
+                document.querySelectorAll('[id^="dd"] div:last-child').forEach(d => d.classList.add('hidden'));
+                document.querySelectorAll('[id^="dd"] svg').forEach(s => s.classList.remove('rotate-180'));
+            }
+        };
+
+        window.openForm = function(kat) {
+            localStorage.removeItem('currentPatient');
+            localStorage.removeItem('langkah1Data');
+            localStorage.removeItem('langkah2Data');
+            localStorage.removeItem('langkah3Data');
+            localStorage.setItem('selectedCategory', kat);
+            window.location.href = '/langkah-1';
+        };
+
+        window.applyFilter = function() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
             filtered = data.filter(d => {
-                const matchQ = !q || d.nama.toLowerCase().includes(q) || d.nik.includes(q) || (d.alamat && d.alamat.toLowerCase().includes(q));
-                const matchKat = !kat || d.kategori === kat;
-                return matchQ && matchKat;
+                const matchKat = !currentKat || d.kategori === currentKat;
+                const matchSearch = !search || 
+                    (d.nama && d.nama.toLowerCase().includes(search)) || 
+                    (d.nik && d.nik.includes(search)) || 
+                    (d.alamat && d.alamat.toLowerCase().includes(search)) || 
+                    (d.kecamatan && d.kecamatan.toLowerCase().includes(search));
+                return matchKat && matchSearch;
             });
 
-            if (sort === 'terbaru') {
-                filtered.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
-            } else if (sort === 'terlama') {
-                filtered.sort((a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0));
-            } else if (sort === 'az') {
-                filtered.sort((a, b) => a.nama.localeCompare(b.nama));
-            } else if (sort === 'za') {
-                filtered.sort((a, b) => b.nama.localeCompare(a.nama));
-            }
+            if (currentSort === 'nama')           filtered.sort((a,b) => a.nama.localeCompare(b.nama));
+            else if (currentSort === 'nik')       filtered.sort((a,b) => a.nik.localeCompare(b.nik));
+            else if (currentSort === 'terbaru')   filtered.sort((a,b) => b.id - a.id);
+            else if (currentSort === 'terlama')   filtered.sort((a,b) => a.id - b.id);
+            else                                  filtered.sort((a,b) => b.id - a.id);
 
+            // Tampilkan tombol Reset jika ada filter aktif
+            const hasFilter = currentKat || currentSort || search;
+            const btnReset = document.getElementById('btnReset');
+            if (hasFilter) {
+                btnReset.classList.remove('hidden');
+            } else {
+                btnReset.classList.add('hidden');
+            }
+            
             currentPage = 1;
             renderTable();
             renderPrintTable();
-        }
+        };
+
+        window.resetFilter = function() {
+            document.getElementById('searchInput').value = '';
+            currentKat = '';
+            currentSort = '';
+            
+            document.getElementById('ddKatLabel').textContent = 'Semua Kategori';
+            document.querySelectorAll('#ddKategori div:last-child div').forEach(d => {
+                d.classList.remove('active', 'bg-pos-green-pale', 'text-pos-green-dark', 'font-bold');
+            });
+            document.querySelector('#ddKategori div:last-child div[data-val=""]').classList.add('active', 'bg-pos-green-pale', 'text-pos-green-dark', 'font-bold');
+            
+            document.getElementById('ddSortLabel').textContent = 'Urutkan';
+            document.querySelectorAll('#ddSort div:last-child div').forEach(d => {
+                d.classList.remove('active', 'bg-pos-green-pale', 'text-pos-green-dark', 'font-bold');
+            });
+            document.querySelector('#ddSort div:last-child div[data-val=""]').classList.add('active', 'bg-pos-green-pale', 'text-pos-green-dark', 'font-bold');
+            
+            applyFilter();
+        };
+
+        window.changeLimit = function(limit) {
+            pageSize = parseInt(limit);
+            currentPage = 1;
+            renderTable();
+        };
 
         function renderTable() {
             const tbody = document.getElementById('tableBody');
             const totalItems = filtered.length;
-            const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+            const totalPages = Math.ceil(totalItems / pageSize) || 1;
 
             if (currentPage > totalPages) currentPage = totalPages;
             if (currentPage < 1) currentPage = 1;
 
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+            const startIndex = (currentPage - 1) * pageSize;
+            const endIndex = Math.min(startIndex + pageSize, totalItems);
             const paginated = filtered.slice(startIndex, endIndex);
+
+            // update infoCount
+            const infoCount = document.getElementById('infoCount');
+            if (infoCount) {
+                if (totalItems === 0) {
+                    infoCount.textContent = 'Menampilkan 0 data';
+                } else {
+                    infoCount.textContent = `Menampilkan ${startIndex + 1}–${endIndex} dari ${totalItems} data`;
+                }
+            }
 
             if (totalItems === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: var(--gray-500);"><i class="ti ti-database-off" style="font-size: 2rem; display: block; margin-bottom: 8px;"></i>Tidak ada data pasien ditemukan</td></tr>';
@@ -1070,7 +1442,7 @@
                 const kategoriLabel = d.kategori === 'ibu' ? 'Ibu Hamil' : (d.kategori === 'balita' ? 'Balita' : 'Lansia');
                 const rowNo = startIndex + i + 1;
                 return `
-                    <tr onclick="goToForm(${d.id})" style="cursor: pointer;">
+                    <tr onclick="lihat(${d.id})" style="cursor: pointer;">
                         <td>${rowNo}</td>
                         <td style="font-weight: 700; color: var(--gray-900);">${d.nama}</td>
                         <td style="font-weight: 700; color: var(--gray-900);">${d.nik}</td>
@@ -1095,7 +1467,7 @@
         }
 
         function renderPagination(totalPages) {
-            const paginationWrap = document.querySelector('.pagination');
+            const paginationWrap = document.getElementById('paginationWrap');
             let html = `<button class="page-btn arrow ${currentPage === 1 ? 'disabled' : ''}" onclick="changePage(${currentPage - 1})" style="${currentPage === 1 ? 'opacity: 0.5; pointer-events: none;' : ''}">&#8249;</button>`;
             
             for (let i = 1; i <= totalPages; i++) {
@@ -1132,18 +1504,9 @@
         }
 
         function edit(id) {
-            const p = data.find(x => x.id === id);
-            if(!p) return;
-            localStorage.setItem('currentPatient', JSON.stringify(p));
-            localStorage.removeItem('langkah1Data');
-            localStorage.removeItem('langkah2Data');
-            localStorage.removeItem('langkah3Data');
-            window.location.href = '/langkah-1';
+            window.location.href = `/patients/${id}/edit`;
         }
 
-        function goToForm(id) {
-            edit(id);
-        }
 
         async function hapus(id) {
             if(!confirm("Apakah Anda yakin ingin menghapus data pasien ini?")) return;
@@ -1182,37 +1545,47 @@
             let logoHtml = `
                 <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 8px; padding-bottom: 16px; margin-bottom: 4px;">
                     <img src="/image/logo.png" style="width: 64px; height: 64px; object-fit: contain;" alt="Logo POSYANDU" />
-                    <h2 style="color: var(--green-mid); font-size: 20px; font-weight: 800; tracking-key: 0.05em; margin-top: 10px; margin-bottom: 0;">POSYANDU</h2>
-                    <p style="font-size: 10px; color: var(--gray-500); font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; font-style: italic; margin-top: 2px; margin-bottom: 0;">Dekat Balita, Dekat Ibu, Dekat Kita</p>
                 </div>
             `;
             
-            // 2. Informasi Dasar
-            let infoDasarHtml = `
-                <div style="background: #white; border-radius: var(--radius); padding: 16px; border: 1px solid var(--gray-100); box-shadow: var(--shadow); margin-bottom: 12px;">
-                    <p style="font-size: 11px; font-weight: 800; color: var(--gray-900); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.05em; text-align: left;">Informasi Dasar</p>
-                    
-                    <div style="margin-bottom: 14px; text-align: left;">
-                        <label style="display: flex; align-items: center; gap: 8px; font-size: 10px; font-weight: 800; color: var(--gray-900); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">
-                            <i class="ti ti-woman" style="font-size: 13px; color: var(--teal);"></i>
-                            <span>${detail.kategori === 'ibu' ? 'Nama Ibu' : 'Nama Balita'}</span>
+            // 2. Informasi Dasar (lengkap sesuai form pendaftaran)
+            const kategoriLabel = detail.kategori === 'ibu' ? 'Ibu Hamil' : (detail.kategori === 'balita' ? 'Balita' : 'Lansia');
+            const kategoriColor = detail.kategori === 'ibu' ? '#1e9e8c' : '#1a5c38';
+            const kategoriLightBg = detail.kategori === 'ibu' ? '#e4f7f5' : '#e8f5ee';
+
+            function infoRow(icon, label, value) {
+                return `
+                    <div style="margin-bottom: 10px; text-align: left;">
+                        <label style="display: flex; align-items: center; gap: 7px; font-size: 10px; font-weight: 800; color: var(--gray-500); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.05em;">
+                            <i class="ti ${icon}" style="font-size: 12px; color: var(--teal);"></i>
+                            <span>${label}</span>
                         </label>
-                        <div style="width: 100%; padding: 10px 14px; border: 1px solid var(--gray-100); border-radius: 8px; font-size: 13px; font-weight: 700; color: var(--gray-900); background: var(--gray-50);">
-                            ${detail.nama}
+                        <div style="width: 100%; padding: 9px 13px; border: 1px solid var(--gray-100); border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--gray-900); background: var(--gray-50);">
+                            ${value || '<span style="color:#aaa;font-style:italic;font-weight:400;">—</span>'}
                         </div>
+                    </div>`;
+            }
+
+            let infoDasarHtml = `
+                <div style="background: #fff; border-radius: var(--radius); padding: 16px; border: 1px solid var(--gray-100); box-shadow: var(--shadow); margin-bottom: 12px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+                        <p style="font-size: 11px; font-weight: 800; color: var(--gray-900); text-transform: uppercase; letter-spacing: 0.05em; margin: 0;">Informasi Pasien</p>
+                        <span style="padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 800; background: ${kategoriLightBg}; color: ${kategoriColor};">${kategoriLabel}</span>
                     </div>
 
-                    <div style="text-align: left;">
-                        <label style="display: flex; align-items: center; gap: 8px; font-size: 10px; font-weight: 800; color: var(--gray-900); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">
-                            <i class="ti ti-world" style="font-size: 13px; color: var(--teal);"></i>
-                            <span>Anak ke</span>
-                        </label>
-                        <div style="width: 100%; padding: 10px 14px; border: 1px solid var(--gray-100); border-radius: 8px; font-size: 13px; font-weight: 700; color: var(--gray-900); background: var(--gray-50);">
-                            ${detail.anakKe || '1'}
-                        </div>
-                    </div>
+                    ${infoRow('ti-user', detail.kategori === 'ibu' ? 'Nama Ibu' : 'Nama Balita', `<span style="font-weight:700;">${detail.nama}</span>`)}
+                    ${infoRow('ti-id-badge', 'NIK', detail.nik)}
+                    ${infoRow('ti-phone', 'No. HP', detail.noHp || detail.hp)}
+                    ${infoRow('ti-calendar', 'Tanggal Lahir', detail.tglLahir ? new Date(detail.tglLahir).toLocaleDateString('id-ID', {day:'2-digit',month:'long',year:'numeric'}) : null)}
+                    ${infoRow('ti-map-pin', 'Alamat', detail.alamat)}
+                    ${infoRow('ti-home', 'Dusun / RT / RW', detail.dusun)}
+                    ${infoRow('ti-building-community', 'Kecamatan', detail.kecamatan)}
+                    ${infoRow('ti-baby-carriage', 'Anak Ke', detail.anakKe)}
+                    ${detail.usiaHamil ? infoRow('ti-heart', 'Usia Kehamilan (saat daftar)', detail.usiaHamil + ' minggu') : ''}
+                    ${detail.tglKunjungan ? infoRow('ti-calendar-event', 'Tanggal Kunjungan', new Date(detail.tglKunjungan).toLocaleDateString('id-ID', {day:'2-digit',month:'long',year:'numeric'})) : ''}
                 </div>
             `;
+
             
             // 3. Render 4 Langkah Accordion
             let stepsHtml = '';
@@ -1414,9 +1787,10 @@
                                     <i class="ti ti-pointer" style="font-size: 12px; color: var(--teal);"></i>
                                     <span>Aksi</span>
                                 </label>
-                                <button onclick="selectPemeriksaan(${pIdx})" style="width: 100%; padding: 10px; border: 1px solid ${isSelected ? 'var(--teal)' : 'var(--gray-100)'}; background: ${isSelected ? 'var(--teal)' : '#fff'}; color: ${isSelected ? '#fff' : 'var(--gray-900)'}; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px; box-shadow: var(--shadow);">
-                                    <span>Lihat Detail Riwayat</span>
-                                </button>
+                                <a href="/riwayat?id=${detail.id}&pemeriksaan_id=${pemeriksaan.id}" style="width: 100%; padding: 10px; border: 1px solid var(--gray-100); background: #fff; color: var(--gray-900); border-radius: 8px; font-size: 11px; font-weight: 800; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 4px; box-shadow: var(--shadow); transition: all 0.2s; box-sizing: border-box;" onmouseover="this.style.borderColor='var(--teal)'; this.style.backgroundColor='var(--gray-50)'; this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--gray-100)'; this.style.backgroundColor='#fff'; this.style.color='var(--gray-900)'">
+                                    <i class="ti ti-external-link" style="font-size: 12px;"></i>
+                                    <span>Lihat Detail</span>
+                                </a>
                             </div>
                         </div>
                     `;

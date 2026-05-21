@@ -10,7 +10,7 @@
             <p class="mt-2 text-[14px] text-pos-gray-500 font-medium">Pantau perkembangan data dan aktivitas Posyandu hari ini.</p>
         </div>
         <div class="admin-badge flex items-center gap-3 bg-white border border-pos-gray-100 rounded-full px-4 py-2 shadow-pos-shadow">
-            <img class="w-10 h-10 rounded-full object-cover border border-pos-green-light" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&h=80&q=80" alt="Admin" />
+            <img class="w-10 h-10 rounded-full object-cover border border-pos-green-light" src="{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&h=80&q=80' }}" alt="Admin" />
             <div class="text-left">
                 <p class="text-xs font-bold leading-none text-pos-gray-900">{{ Auth::user()->name }}</p>
                 <p class="text-[9px] font-bold text-pos-gray-500 uppercase tracking-widest mt-1">{{ Auth::user()->role }}</p>
@@ -94,7 +94,7 @@
     <!-- Table -->
     <div class="pos-table-card [animation-delay:0.3s]">
         <div class="table-header flex items-center justify-between px-6 py-5 border-b border-pos-gray-100">
-            <span class="table-header-title text-base font-bold text-pos-gray-900">Latest Pasien</span>
+            <span class="table-header-title text-base font-bold text-pos-gray-900">Kunjungan Pasien Terbaru</span>
             <a class="view-all text-[13px] font-semibold text-pos-teal no-underline hover:underline" href="/list_data_pasien">View all</a>
         </div>
         <table class="pos-table">
@@ -104,23 +104,27 @@
                     <th>Nama</th>
                     <th>NIK</th>
                     <th>Kategori</th>
-                    <th>Upload Date</th>
+                    <th>Tanggal Periksa</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($latestPatients as $index => $p)
+                @forelse($latestPemeriksaans as $index => $pem)
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td class="!font-bold !text-pos-gray-900">{{ $p->nama }}</td>
-                    <td class="!font-bold !text-pos-gray-900">{{ $p->nik }}</td>
+                    <td class="!font-bold !text-pos-gray-900">{{ $pem->patient->nama }}</td>
+                    <td class="!font-bold !text-pos-gray-900">{{ $pem->patient->nik }}</td>
                     <td>
-                        <span class="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase {{ $p->kategori === 'ibu' ? 'bg-[#e4f7f5] text-pos-teal' : 'bg-pos-green-pale text-pos-green-dark' }}">
-                            {{ $p->kategori === 'ibu' ? 'Ibu Hamil' : 'Balita' }}
+                        <span class="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase {{ $pem->patient->kategori === 'ibu' ? 'bg-[#e4f7f5] text-pos-teal' : 'bg-pos-green-pale text-pos-green-dark' }}">
+                            {{ $pem->patient->kategori === 'ibu' ? 'Ibu Hamil' : 'Balita' }}
                         </span>
                     </td>
-                    <td>{{ $p->created_at->format('M d, Y') }}</td>
+                    <td>{{ $pem->tgl_periksa->format('M d, Y') }}</td>
                 </tr>
-                @endforeach
+                @empty
+                <tr>
+                    <td colspan="5" class="text-center py-6 text-pos-gray-400 font-semibold">Belum ada data pemeriksaan terbaru.</td>
+                </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
@@ -140,9 +144,9 @@
     new Chart(lineCtx, {
       type: 'line',
       data: {
-        labels: ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'],
+        labels: @json($chartData['labels']),
         datasets: [{
-          data: [180, 210, 195, 240, 300, 390, 460, 380, 310, 350, 420, 400],
+          data: @json($chartData['values']),
           borderColor: '#3dab6a',
           borderWidth: 2.5,
           backgroundColor: gradient,
@@ -172,10 +176,14 @@
             ticks: { color: '#7a9186', font: { size: 11, weight: '600' } }
           },
           y: {
-            min: 0, max: 500,
+            min: 0,
             grid: { color: '#eef2f0', drawBorder: false },
             border: { display: false },
-            ticks: { color: '#7a9186', font: { size: 11 }, stepSize: 100 }
+            ticks: { 
+              color: '#7a9186', 
+              font: { size: 11 },
+              precision: 0 // Hanya tampilkan angka bulat untuk kunjungan
+            }
           }
         }
       }

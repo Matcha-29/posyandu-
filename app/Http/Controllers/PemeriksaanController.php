@@ -54,6 +54,12 @@ class PemeriksaanController extends Controller
 
         $periksa = Pemeriksaan::create($data);
 
+        // Update patient's tglKunjungan
+        $patient = Patient::find($data['patient_id']);
+        if ($patient) {
+            $patient->update(['tglKunjungan' => $data['tgl_periksa']]);
+        }
+
         if ($request->wantsJson()) {
             return response()->json($periksa->load('patient'), 201);
         }

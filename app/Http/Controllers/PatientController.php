@@ -45,6 +45,12 @@ class PatientController extends Controller
         return view('petugas.data_pasien', compact('patient'));
     }
 
+    // Edit page — tampilkan halaman edit (admin only)
+    public function edit(Patient $patient)
+    {
+        return view('admin.edit_pasien', compact('patient'));
+    }
+
     // 1.5 — tambah pasien baru
     public function store(Request $request)
     {
@@ -113,14 +119,30 @@ class PatientController extends Controller
         $totalBalita = Patient::where('kategori', 'balita')->count();
         $totalIbu    = Patient::where('kategori', 'ibu')->count();
         
-        $latestPatients = Patient::latest()->take(5)->get();
+        $latestPemeriksaans = \App\Models\Pemeriksaan::whereHas('patient')
+            ->with('patient')
+            ->latest()
+            ->take(5)
+            ->get();
         
-        // Data untuk chart (contoh statis atau bisa dihitung)
+        $currentYear = date('Y');
+        $monthlyCounts = array_fill(1, 12, 0);
+
+        $counts = \App\Models\Pemeriksaan::selectRaw('MONTH(tgl_periksa) as month, count(*) as count')
+            ->whereYear('tgl_periksa', $currentYear)
+            ->groupBy('month')
+            ->pluck('count', 'month')
+            ->toArray();
+
+        foreach ($counts as $month => $count) {
+            $monthlyCounts[$month] = (int) $count;
+        }
+
         $chartData = [
             'labels' => ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'],
-            'values' => [180, 210, 195, 240, 300, 390, 460, 380, 310, 350, 420, 400]
+            'values' => array_values($monthlyCounts)
         ];
 
-        return view('admin.dashboard', compact('totalPasien', 'totalBalita', 'totalIbu', 'latestPatients', 'chartData'));
+        return view('admin.dashboard', compact('totalPasien', 'totalBalita', 'totalIbu', 'latestPemeriksaans', 'chartData'));
     }
 }

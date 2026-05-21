@@ -161,8 +161,7 @@
 </head>
 <body>
 
-<div class="top-bar">
-</div>
+@include('layouts.header_step')
 
 <div class="wrapper">
     <div class="page-title-btn">FORM PENDAFTARAN PASIEN</div>
@@ -225,28 +224,7 @@
                         <label>Kecamatan :</label>
                         <input type="text" id="kecamatan" />
                     </div>
-                    <div class="form-group">
-                        <label>Berat Badan (kg) :</label>
-                        <input type="number" id="beratBadan" step="0.1" />
-                    </div>
-                    <div class="form-group">
-                        <label>Tinggi Badan (cm) :</label>
-                        <input type="number" id="tinggiBadan" />
-                    </div>
-                    <div class="form-group">
-                        <label>Lingkar Kepala (cm) :</label>
-                        <input type="number" id="lingkarKepala" step="0.1" />
-                    </div>
-                    <div class="form-group">
-                        <label>Status Gizi :</label>
-                        <select id="statusGizi">
-                            <option value="">-- Pilih --</option>
-                            <option value="baik">Baik</option>
-                            <option value="kurang">Kurang</option>
-                            <option value="lebih">Lebih</option>
-                            <option value="buruk">Buruk</option>
-                        </select>
-                    </div>
+
 
                     <div class="btn-simpan-wrap">
                         <button type="button" class="btn-kembali" onclick="location.href='/list_data_pasien'">KEMBALI</button>

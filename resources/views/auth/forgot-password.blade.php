@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lupa Password — POSYANDU</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -325,7 +326,6 @@
     const backBtn = document.getElementById('backBtn');
     const resetBtn = document.getElementById('resetBtn');
 
-    let verificationCode = '';
     let resetEmail = '';
 
     function showAlert(msg, type) {
@@ -337,37 +337,80 @@
         alertBox.className = 'alert';
     }
 
-    form.addEventListener('submit', e => {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    form.addEventListener('submit', async e => {
         e.preventDefault();
         hideAlert();
         const email = document.getElementById('email').value.trim();
         if (!email) { showAlert('Email wajib diisi.', 'error'); return; }
         
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
-        const user = users.find(u => u.email === email);
-        if (!user) { showAlert('Email tidak terdaftar.', 'error'); return; }
-        
         resetEmail = email;
-        verificationCode = Math.floor(100000 + Math.random() * 900000).toString(); // Generate 6-digit code
         
         kirimBtn.classList.add('loading');
         kirimBtn.disabled = true;
-        setTimeout(() => {
+        
+        try {
+            const response = await fetch('/forgot-password/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ email })
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                showAlert('Kode verifikasi telah dikirim ke email Anda!', 'success');
+                setTimeout(() => {
+                    form.style.display = 'none';
+                    verificationSection.classList.add('show');
+                    hideAlert();
+                }, 1500);
+            } else {
+                showAlert(result.message || 'Gagal mengirim kode verifikasi.', 'error');
+            }
+        } catch (error) {
+            showAlert('Terjadi kesalahan koneksi.', 'error');
+        } finally {
             kirimBtn.classList.remove('loading');
             kirimBtn.disabled = false;
-            alert('Kode verifikasi: ' + verificationCode + ' (Simulasi - kode ini muncul di alert)');
-            form.style.display = 'none';
-            verificationSection.classList.add('show');
-        }, 1200);
+        }
     });
 
-    verifyBtn.addEventListener('click', () => {
+    verifyBtn.addEventListener('click', async () => {
+        hideAlert();
         const code = document.getElementById('verificationCode').value.trim();
-        if (code === verificationCode) {
-            verificationSection.classList.remove('show');
-            resetSection.classList.add('show');
-        } else {
-            showAlert('Kode verifikasi salah.', 'error');
+        if (!code) { showAlert('Kode verifikasi wajib diisi.', 'error'); return; }
+        
+        verifyBtn.disabled = true;
+        
+        try {
+            const response = await fetch('/forgot-password/verify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ email: resetEmail, code })
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                verificationSection.classList.remove('show');
+                resetSection.classList.add('show');
+            } else {
+                showAlert(result.message || 'Kode verifikasi salah.', 'error');
+            }
+        } catch (error) {
+            showAlert('Terjadi kesalahan koneksi.', 'error');
+        } finally {
+            verifyBtn.disabled = false;
         }
     });
 
@@ -377,7 +420,8 @@
         hideAlert();
     });
 
-    resetBtn.addEventListener('click', () => {
+    resetBtn.addEventListener('click', async () => {
+        hideAlert();
         const newPassword = document.getElementById('newPassword').value.trim();
         const confirmPassword = document.getElementById('confirmPassword').value.trim();
         
@@ -391,15 +435,36 @@
             return;
         }
         
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
-        const userIndex = users.findIndex(u => u.email === resetEmail);
-        if (userIndex !== -1) {
-            users[userIndex].password = newPassword;
-            localStorage.setItem('users', JSON.stringify(users));
-            showAlert('Password berhasil diubah! Silakan login.', 'success');
-            setTimeout(() => {
-                window.location.href = '/login';
-            }, 2000);
+        resetBtn.disabled = true;
+        
+        try {
+            const response = await fetch('/forgot-password/reset', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    password: newPassword,
+                    password_confirmation: confirmPassword
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                showAlert('Password berhasil diubah! Mengalihkan ke login...', 'success');
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 2000);
+            } else {
+                showAlert(result.message || 'Gagal merubah password.', 'error');
+            }
+        } catch (error) {
+            showAlert('Terjadi kesalahan koneksi.', 'error');
+        } finally {
+            resetBtn.disabled = false;
         }
     });
 

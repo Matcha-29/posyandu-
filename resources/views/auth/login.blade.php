@@ -173,31 +173,8 @@
       max-width: 1200px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: 1.5fr 1fr 1fr 1.2fr 1.2fr;
+      grid-template-columns: 1.5fr 1fr 1fr 1.8fr;
       gap: 32px;
-    }
-    .footer-partners {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      margin-left: 40px;
-    }
-    .partners-logos {
-      display: flex;
-      gap: 20px;
-      align-items: center;
-    }
-    .partners-logos img {
-      height: 60px;
-      width: auto;
-      max-width: 160px;
-      object-fit: contain;
-      transition: transform 0.3s ease;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-    }
-    .partners-logos img:hover {
-      transform: scale(1.1);
-      opacity: 1;
     }
     .footer-deco {
       position: absolute;
@@ -334,7 +311,6 @@
           <div class="submit-wrap">
             <button class="btn-login" id="loginBtn" type="submit">LOGIN</button>
           </div>
-          <div class="bottom-note">Belum punya akun? <a href="/daftar">Daftar</a></div>
         </form>
       </div>
     </div>
@@ -359,26 +335,30 @@
         <span>Address: 0123 Some place</span>
         <span>Some country</span>
       </div>
-      <div class="newsletter">
+      <div class="newsletter" style="display: flex; flex-direction: column; gap: 12px;">
         <div class="footer-title">Newsletter</div>
-        <p>Subscribe to get latest updates and news.</p>
-        <div style="display: flex; gap: 10px; align-items: center;">
-          <input class="news-input" type="email" placeholder="Email address" />
-          <button class="news-submit" aria-label="Subscribe">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        <div class="newsletter-input-wrapper" style="position: relative; width: 100%;">
+          <input type="email" placeholder="Enter your email address" style="width: 100%; padding: 14px 48px 14px 18px; border-radius: 8px; border: none; background: #fff; color: #1c1c1c; font-size: 0.9rem; outline: none;" />
+          <button type="button" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); border: none; background: none; color: #0E766D; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
           </button>
         </div>
-      </div>
-      <div class="footer-partners">
-        <div class="footer-title">Supported By</div>
-        <div class="partners-logos">
-          <img src="{{ asset('image/logo_polije.png') }}" alt="Polije Logo" title="Politeknik Negeri Jember" />
-          <img src="{{ asset('image/logo_trkk.png') }}" alt="TRK Logo" title="Teknologi Rekayasa Komputer" />
+        <div class="footer-partners-wrap" style="margin-top: 12px; display: flex; gap: 14px; align-items: center; justify-content: flex-start; flex-wrap: wrap;">
+          <img src="{{ asset('image/footer.png') }}" alt="Polije Logo" style="height: 38px; width: auto; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06));" />
+          <img src="{{ asset('image/logo_trkk.png') }}" alt="TRK Logo" style="height: 38px; width: auto; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06));" />
         </div>
       </div>
     </div>
-    <img src="https://www.transparenttextures.com/patterns/cubes.png" class="footer-deco" alt="" />
-    <div class="footer-bottom">© 2024 Posyandu - Dedicated to Health & Excellence</div>
+    <div style="max-width: 1200px; margin: 32px auto 0; border-top: 1px solid rgba(255,255,255,.18); padding-top: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+      <div style="font-size: 0.88rem; color: rgba(255,255,255,.75);">© 2021 Posyandu</div>
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <a href="#" style="width: 28px; height: 28px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; text-decoration: none; color: #0E766D; font-size: 11px; font-weight: 800; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">in</a>
+        <a href="#" style="width: 28px; height: 28px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; text-decoration: none; color: #0E766D; font-size: 13px; font-weight: 800; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">f</a>
+        <a href="#" style="width: 28px; height: 28px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; text-decoration: none; color: #0E766D; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+        </a>
+      </div>
+    </div>
   </div>
   <script>
     const eyeBtn = document.getElementById('eyeBtn');

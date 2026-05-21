@@ -46,10 +46,10 @@
                 @apply flex items-center gap-[10px] px-5 py-[11px] bg-pos-teal text-white text-[0.88rem] font-bold rounded-[10px] shadow-[0_4px_14px_rgba(14,118,109,0.1)] transition-all hover:bg-pos-teal-dark hover:-translate-y-[1px];
             }
             .dd-trigger {
-                @apply flex items-center gap-[10px] px-[14px] py-[10px] min-w-[170px] border-[1.5px] border-pos-border rounded-[10px] bg-white cursor-pointer shadow-[0_1px_4px_rgba(0,0,0,0.04)] transition-all hover:border-pos-teal hover:shadow-[0_0_0_3px_rgba(14,118,109,0.08)];
+                @apply flex items-center gap-[10px] px-[14px] py-[10px] min-w-[140px] border-[1.5px] border-pos-border rounded-[10px] bg-white cursor-pointer shadow-[0_1px_4px_rgba(0,0,0,0.04)] transition-all hover:border-pos-teal hover:shadow-[0_0_0_3px_rgba(14,118,109,0.08)];
             }
             .search-input {
-                @apply pl-[38px] pr-4 py-[10px] border-[1.5px] border-pos-border rounded-[10px] bg-white text-[0.87rem] outline-none w-[220px] shadow-[0_1px_4px_rgba(0,0,0,0.04)] transition-all focus:border-pos-teal focus:shadow-[0_0_0_3px_rgba(14,118,109,0.1)];
+                @apply pl-[36px] pr-4 py-[10px] border-[1.5px] border-pos-border rounded-[10px] bg-white text-[0.87rem] outline-none w-[170px] shadow-[0_1px_4px_rgba(0,0,0,0.04)] transition-all focus:border-pos-teal focus:shadow-[0_0_0_3px_rgba(14,118,109,0.1)] focus:w-[200px];
             }
             .tbl-header-cell {
                 @apply px-3 py-4 text-[0.8rem] font-bold text-white tracking-wider uppercase;
@@ -59,20 +59,43 @@
             }
             .badge-kategori.ibu { @apply bg-[#d4edda] text-[#1a6b30] border border-[#a8d5b5]; }
             .badge-kategori.balita { @apply bg-[#fce4ec] text-[#ad1457] border border-[#f48fb1]; }
+            .badge-kategori.lansia { @apply bg-[#e2f1fd] text-[#0d47a1] border border-[#bbdefb]; }
+            
+            /* Pagination */
+            .pagination {
+                @apply flex items-center gap-[6px];
+            }
+            .page-btn {
+                @apply min-w-[36px] h-9 rounded-lg border-[1.5px] border-pos-border bg-white text-pos-text text-[13px] font-bold flex items-center justify-center cursor-pointer transition-all px-2.5;
+            }
+            .page-btn:hover {
+                @apply border-pos-teal text-pos-teal;
+            }
+            .page-btn.active {
+                @apply bg-pos-teal border-pos-teal text-white shadow-[0_3px_10px_rgba(14,118,109,0.25)];
+            }
+            .page-btn.arrow {
+                @apply text-base;
+            }
+            .page-dots {
+                @apply text-pos-muted px-1.5 font-bold;
+            }
         }
     </style>
 </head>
 <body class="bg-pos-bg text-pos-text min-h-screen flex flex-col font-sans">
     <!-- ── TOP BAR ── -->
     <header class="w-full h-[70px] bg-pos-teal flex items-center justify-between px-10 shadow-[0_2px_12px_rgba(0,0,0,0.12)] shrink-0">
-      <div class="flex items-center gap-3">
-        <img src="{{ asset('image/logo.png') }}" class="h-10 w-auto brightness-0 invert" alt="Logo" />
-        <span class="text-white font-bold text-xl tracking-tight">POSYANDU</span>
-      </div>
+      <div class="flex items-center">
+      <img src="{{ asset('image/logo.png') }}" class="h-14 w-auto" alt="Logo POSYANDU" />
+    </div>
       <div class="flex items-center gap-6">
-        <div class="text-white text-right">
-          <p class="text-sm font-bold leading-none">{{ Auth::user()->name }}</p>
-          <p class="text-[0.7rem] opacity-80 uppercase tracking-widest mt-1">{{ Auth::user()->role }}</p>
+        <div class="flex items-center gap-3">
+          <div class="text-white text-right">
+            <p class="text-sm font-bold leading-none">{{ Auth::user()->name }}</p>
+            <p class="text-[0.7rem] opacity-80 uppercase tracking-widest mt-1">{{ Auth::user()->role }}</p>
+          </div>
+          <img class="w-10 h-10 rounded-full object-cover border-2 border-pos-teal-light shadow-sm" src="{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&h=80&q=80' }}" alt="Petugas" />
         </div>
         <form action="{{ route('logout') }}" method="POST">
           @csrf
@@ -83,14 +106,14 @@
       </div>
     </header>
 
-    <main class="flex-1 px-10 py-9 pb-12 max-w-[1300px] w-full mx-auto">
+    <main class="flex-1 px-10 py-9 pb-36 max-w-[1300px] w-full mx-auto">
         <div class="flex items-center justify-between mb-6">
           <h1 class="text-[1.75rem] font-extrabold text-pos-text">List Data Pasien</h1>
           <div class="flex items-center gap-3">
+            @if(Auth::user()->role === 'admin')
             <a href="/laporan" class="flex items-center gap-2 px-4 py-[10px] bg-white border border-pos-border rounded-lg text-[0.87rem] font-bold text-pos-text hover:bg-pos-teal-light hover:text-pos-teal hover:border-pos-teal transition-all">
               <i class="ti ti-report text-lg"></i> Laporan
             </a>
-            @if(Auth::user()->role === 'admin')
             <a href="/data_akun" class="flex items-center gap-2 px-4 py-[10px] bg-white border border-pos-border rounded-lg text-[0.87rem] font-bold text-pos-text hover:bg-pos-teal-light hover:text-pos-teal hover:border-pos-teal transition-all">
               <i class="ti ti-users text-lg"></i> Kelola Akun
             </a>
@@ -98,48 +121,70 @@
           </div>
         </div>
 
-        <div class="toolbar flex items-center gap-[14px] mb-6 flex-wrap">
-            <button class="btn-tambah" onclick="document.getElementById('katOverlay').classList.remove('hidden'); document.getElementById('katOverlay').classList.add('flex')">
-                Tambah Data
-                <span class="w-[26px] h-[26px] bg-white/25 rounded-md flex items-center justify-center text-[1.1rem] font-black leading-none">+</span>
-            </button>
-            <span class="text-[0.87rem] text-pos-muted whitespace-nowrap mr-1" id="infoCount">Menampilkan 0 dari 0 data</span>
-            <div class="grow"></div>
-
-            <!-- Dropdown: Kategori -->
-            <div class="relative select-none" id="ddKategori">
-                <div class="dd-trigger" onclick="toggleDD('ddKategori')">
-                    <span class="grow font-semibold text-[0.87rem] text-pos-text" id="ddKatLabel">Semua Kategori</span>
-                    <svg class="text-pos-muted shrink-0 transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m19 9-7 7-7-7"/></svg>
-                </div>
-                <div class="hidden absolute top-[calc(100%+8px)] left-0 min-w-full bg-white border-[1.5px] border-pos-border rounded-xl shadow-[0_8px_28px_rgba(0,0,0,0.1)] overflow-hidden z-50">
-                    <div class="px-[14px] py-[10px] text-[0.86rem] font-medium text-pos-text cursor-pointer hover:bg-pos-teal-light hover:text-pos-teal-dark transition-colors active" data-val="" data-label="Semua Kategori" onclick="pickKat(this)">Semua Kategori</div>
-                    <div class="h-px bg-pos-border my-1"></div>
-                    <div class="px-[14px] py-[10px] text-[0.86rem] font-medium text-pos-text cursor-pointer hover:bg-pos-teal-light hover:text-pos-teal-dark transition-colors" data-val="ibu" data-label="Ibu Hamil" onclick="pickKat(this)">Ibu Hamil</div>
-                    <div class="px-[14px] py-[10px] text-[0.86rem] font-medium text-pos-text cursor-pointer hover:bg-pos-teal-light hover:text-pos-teal-dark transition-colors" data-val="balita" data-label="Balita" onclick="pickKat(this)">Balita</div>
-                </div>
+        <!-- Unified Toolbar (Tambah Data, Info, Filters) -->
+        <div class="bg-white border border-pos-border rounded-2xl shadow-pos-shadow p-3.5 mb-6 flex flex-wrap lg:flex-nowrap items-center justify-between gap-3 w-full">
+            <!-- Left Section: Add Button & Info -->
+            <div class="flex items-center gap-4 shrink-0 w-full lg:w-auto">
+                <button class="btn-tambah !py-[9px] !px-4" onclick="document.getElementById('katOverlay').classList.remove('hidden'); document.getElementById('katOverlay').classList.add('flex')">
+                    Tambah Data
+                    <span class="w-6 h-6 bg-white/25 rounded-md flex items-center justify-center text-sm font-black leading-none ml-1.5">+</span>
+                </button>
+                <span class="text-[0.87rem] text-pos-muted font-bold whitespace-nowrap hidden sm:block" id="infoCount">Menampilkan 0 dari 0 data</span>
             </div>
 
-            <div class="relative">
-                <svg class="absolute left-[11px] top-1/2 -translate-y-1/2 text-[#bbb] pointer-events-none" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/></svg>
-                <input type="text" id="searchInput" class="search-input" placeholder="Telusuri..." oninput="applyFilter()" />
-            </div>
+            <!-- Right Section: Filters -->
+            <div class="flex items-center gap-2.5 grow justify-end w-full lg:w-auto">
+                <!-- Dropdown: Kategori -->
+                <div class="relative select-none shrink-0" id="ddKategori">
+                    <div class="dd-trigger" onclick="toggleDD('ddKategori')">
+                        <i class="ti ti-category text-pos-teal text-base"></i>
+                        <span class="grow font-semibold text-[0.87rem] text-pos-text" id="ddKatLabel">Semua Kategori</span>
+                        <svg class="text-pos-muted shrink-0 transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m19 9-7 7-7-7"/></svg>
+                    </div>
+                    <div class="hidden absolute top-[calc(100%+8px)] left-0 min-w-full bg-white border-[1.5px] border-pos-border rounded-xl shadow-[0_8px_28px_rgba(0,0,0,0.1)] overflow-hidden z-50">
+                        <div class="px-[14px] py-[10px] text-[0.86rem] font-medium text-pos-text cursor-pointer hover:bg-pos-teal-light hover:text-pos-teal-dark transition-colors active" data-val="" data-label="Semua Kategori" onclick="pickKat(this)">Semua Kategori</div>
+                        <div class="h-px bg-pos-border my-1"></div>
+                        <div class="px-[14px] py-[10px] text-[0.86rem] font-medium text-pos-text cursor-pointer hover:bg-pos-teal-light hover:text-pos-teal-dark transition-colors" data-val="ibu" data-label="Ibu Hamil" onclick="pickKat(this)">Ibu Hamil</div>
+                        <div class="px-[14px] py-[10px] text-[0.86rem] font-medium text-pos-text cursor-pointer hover:bg-pos-teal-light hover:text-pos-teal-dark transition-colors" data-val="balita" data-label="Balita" onclick="pickKat(this)">Balita</div>
+                        <div class="px-[14px] py-[10px] text-[0.86rem] font-medium text-pos-text cursor-pointer hover:bg-pos-teal-light hover:text-pos-teal-dark transition-colors" data-val="lansia" data-label="Lansia" onclick="pickKat(this)">Lansia</div>
+                    </div>
+                </div>
 
-            <!-- Dropdown: Urutkan -->
-            <div class="relative select-none" id="ddSort">
-                <div class="dd-trigger" onclick="toggleDD('ddSort')">
-                    <span class="grow font-semibold text-[0.87rem] text-pos-text" id="ddSortLabel">Urutkan</span>
-                    <svg class="text-pos-muted shrink-0 transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m19 9-7 7-7-7"/></svg>
+                <!-- Dropdown: Urutkan -->
+                <div class="relative select-none" id="ddSort">
+                    <div class="dd-trigger" onclick="toggleDD('ddSort')">
+                        <i class="ti ti-arrows-sort text-pos-teal text-base"></i>
+                        <span class="grow font-semibold text-[0.87rem] text-pos-text" id="ddSortLabel">Urutkan</span>
+                        <svg class="text-pos-muted shrink-0 transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m19 9-7 7-7-7"/></svg>
+                    </div>
+                    <div class="hidden absolute top-[calc(100%+8px)] left-0 min-w-full bg-white border-[1.5px] border-pos-border rounded-xl shadow-[0_8px_28px_rgba(0,0,0,0.1)] overflow-hidden z-50">
+                        <div class="px-[14px] py-[10px] text-[0.86rem] font-medium text-pos-text cursor-pointer hover:bg-pos-teal-light hover:text-pos-teal-dark transition-colors active" data-val="" data-label="Urutkan" onclick="pickSort(this)">Default</div>
+                        <div class="h-px bg-pos-border my-1"></div>
+                        <div class="px-[14px] py-[10px] text-[0.86rem] font-medium text-pos-text cursor-pointer hover:bg-pos-teal-light hover:text-pos-teal-dark transition-colors" data-val="nama" data-label="Nama A–Z" onclick="pickSort(this)">Nama A–Z</div>
+                        <div class="px-[14px] py-[10px] text-[0.86rem] font-medium text-pos-text cursor-pointer hover:bg-pos-teal-light hover:text-pos-teal-dark transition-colors" data-val="nik" data-label="NIK" onclick="pickSort(this)">NIK</div>
+                        <div class="px-[14px] py-[10px] text-[0.86rem] font-medium text-pos-text cursor-pointer hover:bg-pos-teal-light hover:text-pos-teal-dark transition-colors" data-val="kecamatan" data-label="Kecamatan" onclick="pickSort(this)">Kecamatan</div>
+                    </div>
                 </div>
-                <div class="hidden absolute top-[calc(100%+8px)] left-0 min-w-full bg-white border-[1.5px] border-pos-border rounded-xl shadow-[0_8px_28px_rgba(0,0,0,0.1)] overflow-hidden z-50">
-                    <div class="px-[14px] py-[10px] text-[0.86rem] font-medium text-pos-text cursor-pointer hover:bg-pos-teal-light hover:text-pos-teal-dark transition-colors active" data-val="" data-label="Urutkan" onclick="pickSort(this)">Default</div>
-                    <div class="h-px bg-pos-border my-1"></div>
-                    <div class="px-[14px] py-[10px] text-[0.86rem] font-medium text-pos-text cursor-pointer hover:bg-pos-teal-light hover:text-pos-teal-dark transition-colors" data-val="nama" data-label="Nama A–Z" onclick="pickSort(this)">Nama A–Z</div>
-                    <div class="px-[14px] py-[10px] text-[0.86rem] font-medium text-pos-text cursor-pointer hover:bg-pos-teal-light hover:text-pos-teal-dark transition-colors" data-val="nik" data-label="NIK" onclick="pickSort(this)">NIK</div>
-                    <div class="px-[14px] py-[10px] text-[0.86rem] font-medium text-pos-text cursor-pointer hover:bg-pos-teal-light hover:text-pos-teal-dark transition-colors" data-val="kecamatan" data-label="Kecamatan" onclick="pickSort(this)">Kecamatan</div>
+
+                <!-- Search -->
+                <div class="relative grow min-w-[200px]">
+                    <i class="ti ti-search absolute left-[12px] top-1/2 -translate-y-1/2 text-pos-muted text-base pointer-events-none"></i>
+                    <input type="text" id="searchInput" class="search-input !w-full pl-[36px]" style="width: 100%;" placeholder="Cari nama, NIK..." />
                 </div>
+
+                <!-- Right: Action Buttons -->
+                <!-- Tombol Terapkan -->
+                <button onclick="applyFilter()" class="flex items-center gap-2 px-5 py-[10px] bg-pos-teal text-white text-[0.87rem] font-bold rounded-[10px] shadow-[0_4px_12px_rgba(14,118,109,0.2)] hover:bg-pos-teal-dark transition-all hover:-translate-y-[1px] border-none cursor-pointer shrink-0">
+                    <i class="ti ti-filter text-base"></i> Terapkan
+                </button>
+
+                <!-- Tombol Reset -->
+                <button onclick="resetFilter()" class="flex items-center gap-2 px-4 py-[10px] bg-white border border-pos-border text-pos-muted text-[0.87rem] font-bold rounded-[10px] hover:border-pos-teal hover:text-pos-teal transition-all border-none cursor-pointer hidden shrink-0" id="btnReset">
+                    <i class="ti ti-x text-base"></i> Reset
+                </button>
             </div>
         </div>
+    </div>
 
         <div class="bg-white rounded-2xl overflow-hidden shadow-pos-shadow border border-pos-border">
             <div class="grid grid-cols-[46px_1.3fr_178px_1fr_115px_115px_60px] bg-pos-teal px-5">
@@ -153,7 +198,25 @@
             </div>
             <div class="p-2.5 flex flex-col gap-2" id="tblBody"></div>
         </div>
+
+        <!-- Pagination Row -->
+        <div class="flex items-center justify-between mt-5 flex-wrap gap-3">
+            <!-- Limit Selector -->
+            <div class="flex items-center gap-2">
+                <span class="text-[13px] font-bold text-pos-muted">Tampilkan:</span>
+                <div class="relative flex items-center group">
+                    <select id="limitSelect" onchange="changeLimit(this.value)" class="h-9 pl-3.5 pr-8 border-[1.5px] border-pos-border rounded-lg bg-white text-[13px] font-bold text-pos-text outline-none focus:border-pos-teal cursor-pointer transition-all hover:border-pos-teal hover:text-pos-teal appearance-none shadow-sm">
+                        <option value="5">5 data</option>
+                        <option value="10">10 data</option>
+                        <option value="20">20 data</option>
+                    </select>
+                    <svg class="absolute right-2.5 text-pos-muted pointer-events-none w-3.5 h-3.5 transition-colors duration-200 group-hover:text-pos-teal" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="m19 9-7 7-7-7"/></svg>
+                </div>
+            </div>
+            <div class="pagination" id="paginationWrap"></div>
+        </div>
     </main>
+
 
     <!-- POPUP PILIH KATEGORI -->
     <div class="hidden fixed inset-0 bg-black/45 z-[200] items-center justify-center backdrop-blur-[4px] animate-[fadeIn_0.2s_ease]" id="katOverlay" onclick="if(event.target===this) { this.classList.add('hidden'); this.classList.remove('flex'); }">
@@ -232,21 +295,31 @@
         let filtered = [...data];
         let currentSort = '';
         let currentKat = '';
+        let currentPage = 1;
+        let pageSize = 5;
 
         function render() {
             const body = document.getElementById('tblBody');
-            document.getElementById('infoCount').textContent = 'Menampilkan ' + filtered.length + ' dari ' + data.length + ' data';
+            
+            let start = filtered.length > 0 ? (currentPage - 1) * pageSize + 1 : 0;
+            let end = Math.min(currentPage * pageSize, filtered.length);
+            document.getElementById('infoCount').textContent = `Menampilkan ${start} - ${end} dari ${filtered.length} data`;
 
             if (filtered.length === 0) {
                 body.innerHTML = '<div class="flex flex-col items-center justify-center p-[60px_20px] text-pos-muted gap-2.5"><i class="ti ti-database-off text-5xl opacity-20"></i><p class="text-[0.9rem]">Tidak ada data ditemukan</p></div>';
+                document.getElementById('paginationWrap').innerHTML = '';
                 return;
             }
 
-            body.innerHTML = filtered.map((d, i) => {
+            const startIndex = (currentPage - 1) * pageSize;
+            const paginated = filtered.slice(startIndex, startIndex + pageSize);
+
+            body.innerHTML = paginated.map((d, i) => {
                 const kategoriLabel = d.kategori === 'ibu' ? 'Ibu Hamil' : (d.kategori === 'balita' ? 'Balita' : 'Lansia');
+                const rowNum = startIndex + i + 1;
                 return `
                 <div class="grid grid-cols-[46px_1.3fr_178px_1fr_115px_115px_60px] items-center px-2 border-[1.5px] border-pos-border rounded-[10px] min-h-[58px] bg-white transition-all duration-200 hover:shadow-[0_4px_16px_rgba(14,118,109,0.1)] hover:border-[#b0d5d1] hover:bg-[#f9fffe] animate-[rowIn_0.4s_ease_both] cursor-pointer" style="animation-delay:${i * 0.05}s" onclick="goToForm(${d.id})">
-                    <div class="px-3 py-[14px] text-sm font-bold text-pos-teal text-center">${i + 1}</div>
+                    <div class="px-3 py-[14px] text-sm font-bold text-pos-teal text-center">${rowNum}</div>
                     <div class="px-3 py-[14px] text-[0.875rem] text-pos-text leading-[1.4]">${d.nama}</div>
                     <div class="px-3 py-[14px] text-[0.875rem] text-pos-text leading-[1.4]">${d.nik}</div>
                     <div class="px-3 py-[14px] text-[0.875rem] text-pos-text leading-[1.4]">${d.alamat}</div>
@@ -259,6 +332,43 @@
                     </div>
                 </div>`;
             }).join('');
+
+            renderPagination(Math.ceil(filtered.length / pageSize));
+        }
+
+        function changePage(p) {
+            currentPage = p;
+            render();
+        }
+
+        function changeLimit(limit) {
+            pageSize = parseInt(limit);
+            currentPage = 1;
+            render();
+        }
+
+        function renderPagination(totalPages) {
+            const paginationWrap = document.getElementById('paginationWrap');
+            if (totalPages <= 1) {
+                paginationWrap.innerHTML = '';
+                return;
+            }
+            let html = `<button class="page-btn arrow" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled style="opacity: 0.5; pointer-events: none;"' : ''}>&#8249;</button>`;
+            
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                    html += `<button class="page-btn ${currentPage === i ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+                } else if (i === 2 || i === totalPages - 1) {
+                    if (i === 2 && currentPage > 3) {
+                        html += `<span class="page-dots">...</span>`;
+                    } else if (i === totalPages - 1 && currentPage < totalPages - 2) {
+                        html += `<span class="page-dots">...</span>`;
+                    }
+                }
+            }
+            
+            html += `<button class="page-btn arrow" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled style="opacity: 0.5; pointer-events: none;"' : ''}>&#8250;</button>`;
+            paginationWrap.innerHTML = html;
         }
 
         function toggleDD(id) {
@@ -275,7 +385,9 @@
             document.getElementById('ddKatLabel').textContent = el.dataset.label;
             document.querySelectorAll('#ddKategori div:last-child div').forEach(d => d.classList.remove('active', 'bg-pos-teal-light', 'text-pos-teal-dark', 'font-bold'));
             el.classList.add('active', 'bg-pos-teal-light', 'text-pos-teal-dark', 'font-bold');
-            applyFilter();
+            // Tutup dropdown, TIDAK auto-apply
+            document.querySelectorAll('[id^="dd"] div:last-child').forEach(d => d.classList.add('hidden'));
+            document.querySelectorAll('[id^="dd"] svg').forEach(s => s.classList.remove('rotate-180'));
         }
 
         function pickSort(el) {
@@ -283,7 +395,9 @@
             document.getElementById('ddSortLabel').textContent = el.dataset.label;
             document.querySelectorAll('#ddSort div:last-child div').forEach(d => d.classList.remove('active', 'bg-pos-teal-light', 'text-pos-teal-dark', 'font-bold'));
             el.classList.add('active', 'bg-pos-teal-light', 'text-pos-teal-dark', 'font-bold');
-            applyFilter();
+            // Tutup dropdown, TIDAK auto-apply
+            document.querySelectorAll('[id^="dd"] div:last-child').forEach(d => d.classList.add('hidden'));
+            document.querySelectorAll('[id^="dd"] svg').forEach(s => s.classList.remove('rotate-180'));
         }
 
         function applyFilter() {
@@ -298,7 +412,34 @@
             else if (currentSort === 'nik')       filtered.sort((a,b) => a.nik.localeCompare(b.nik));
             else if (currentSort === 'kecamatan') filtered.sort((a,b) => a.kecamatan.localeCompare(b.kecamatan));
             else                                  filtered.sort((a,b) => b.id - a.id);
+
+            // Tampilkan tombol Reset jika ada filter aktif
+            const hasFilter = currentKat || currentSort || search;
+            const btnReset = document.getElementById('btnReset');
+            if (hasFilter) {
+                btnReset.classList.remove('hidden');
+            } else {
+                btnReset.classList.add('hidden');
+            }
             
+            currentPage = 1;
+            render();
+        }
+
+        function resetFilter() {
+            currentKat  = '';
+            currentSort = '';
+            document.getElementById('searchInput').value = '';
+            document.getElementById('ddKatLabel').textContent  = 'Semua Kategori';
+            document.getElementById('ddSortLabel').textContent = 'Urutkan';
+            document.querySelectorAll('#ddKategori div:last-child div').forEach(d => d.classList.remove('active', 'bg-pos-teal-light', 'text-pos-teal-dark', 'font-bold'));
+            document.querySelectorAll('#ddSort div:last-child div').forEach(d => d.classList.remove('active', 'bg-pos-teal-light', 'text-pos-teal-dark', 'font-bold'));
+            document.getElementById('btnReset').classList.add('hidden');
+            document.getElementById('limitSelect').value = '5';
+            pageSize = 5;
+            filtered = [...data];
+            filtered.sort((a,b) => b.id - a.id);
+            currentPage = 1;
             render();
         }
 
@@ -335,38 +476,65 @@
             // 1. Logo POSYANDU di bagian atas
             let logoHtml = `
                 <div class="flex flex-col items-center justify-center pt-2 pb-4 mb-1">
-                    <img src="/image/logo.png" class="w-16 h-16 object-contain" alt="Logo POSYANDU" />
-                    <h2 class="text-pos-teal text-xl font-extrabold tracking-wider mt-2.5">POSYANDU</h2>
-                    <p class="text-[10px] text-pos-gray-500 font-extrabold tracking-widest uppercase italic mt-0.5">Dekat Balita, Dekat Ibu, Dekat Kita</p>
+                    <img src="/image/logo.png" class="w-36 h-24 object-contain" alt="Logo POSYANDU" />
                 </div>
             `;
             
-            // 2. Informasi Dasar
+            // 2. Informasi Lengkap Pasien
             let infoDasarHtml = `
                 <div class="bg-white rounded-pos-radius p-4 border border-pos-border shadow-sm mb-3">
-                    <p class="text-[11px] font-extrabold text-pos-navy mb-3.5 uppercase tracking-wider text-left">Informasi Dasar</p>
-                    
-                    <div class="mb-3.5 text-left">
-                        <label class="flex items-center gap-2 text-[10px] font-extrabold text-pos-navy mb-1.5 uppercase tracking-wider">
-                            <i class="ti ti-woman text-[13px] text-pos-teal"></i>
-                            <span>${detail.kategori === 'ibu' ? 'Nama Ibu' : 'Nama Balita'}</span>
-                        </label>
-                        <div class="w-full px-3 py-2.5 border border-pos-border rounded-lg bg-pos-bg text-[13px] font-bold text-pos-navy shadow-inner">
-                            ${detail.nama}
+                    <p class="text-[11px] font-extrabold text-pos-navy mb-3.5 uppercase tracking-wider text-left">Informasi Lengkap Pasien</p>
+                    <div class="grid grid-cols-2 gap-3 text-left">
+                        <div class="bg-pos-bg border border-pos-border rounded-lg p-2.5 col-span-2">
+                            <span class="block text-[9px] font-extrabold text-pos-muted uppercase tracking-wider mb-1">${detail.kategori === 'ibu' ? 'Nama Ibu' : 'Nama Balita'}</span>
+                            <span class="text-xs font-extrabold text-pos-navy">${detail.nama || '-'}</span>
                         </div>
-                    </div>
-
-                    <div class="text-left">
-                        <label class="flex items-center gap-2 text-[10px] font-extrabold text-pos-navy mb-1.5 uppercase tracking-wider">
-                            <i class="ti ti-world text-[13px] text-pos-teal"></i>
-                            <span>Anak ke</span>
-                        </label>
-                        <div class="w-full px-3 py-2.5 border border-pos-border rounded-lg bg-pos-bg text-[13px] font-bold text-pos-navy shadow-inner">
-                            ${detail.anakKe || '1'}
+                        <div class="bg-pos-bg border border-pos-border rounded-lg p-2.5">
+                            <span class="block text-[9px] font-extrabold text-pos-muted uppercase tracking-wider mb-1">NIK</span>
+                            <span class="text-xs font-extrabold text-pos-navy">${detail.nik || '-'}</span>
+                        </div>
+                        <div class="bg-pos-bg border border-pos-border rounded-lg p-2.5">
+                            <span class="block text-[9px] font-extrabold text-pos-muted uppercase tracking-wider mb-1">No. HP</span>
+                            <span class="text-xs font-extrabold text-pos-navy">${detail.noHp || '-'}</span>
+                        </div>
+                        <div class="bg-pos-bg border border-pos-border rounded-lg p-2.5">
+                            <span class="block text-[9px] font-extrabold text-pos-muted uppercase tracking-wider mb-1">Tanggal Lahir</span>
+                            <span class="text-xs font-extrabold text-pos-navy">${detail.tglLahir ? new Date(detail.tglLahir).toLocaleDateString('id-ID', {day:'2-digit',month:'long',year:'numeric'}) : '-'}</span>
+                        </div>
+                        <div class="bg-pos-bg border border-pos-border rounded-lg p-2.5">
+                            <span class="block text-[9px] font-extrabold text-pos-muted uppercase tracking-wider mb-1">Kategori</span>
+                            <span class="text-xs font-extrabold text-pos-navy uppercase">${detail.kategori === 'ibu' ? 'Ibu Hamil' : 'Balita'}</span>
+                        </div>
+                        <div class="bg-pos-bg border border-pos-border rounded-lg p-2.5 col-span-2">
+                            <span class="block text-[9px] font-extrabold text-pos-muted uppercase tracking-wider mb-1">Alamat</span>
+                            <span class="text-xs font-extrabold text-pos-navy">${detail.alamat || '-'}</span>
+                        </div>
+                        <div class="bg-pos-bg border border-pos-border rounded-lg p-2.5">
+                            <span class="block text-[9px] font-extrabold text-pos-muted uppercase tracking-wider mb-1">Dusun / RT RW</span>
+                            <span class="text-xs font-extrabold text-pos-navy">${detail.dusun || '-'}</span>
+                        </div>
+                        <div class="bg-pos-bg border border-pos-border rounded-lg p-2.5">
+                            <span class="block text-[9px] font-extrabold text-pos-muted uppercase tracking-wider mb-1">Kecamatan</span>
+                            <span class="text-xs font-extrabold text-pos-navy">${detail.kecamatan || '-'}</span>
+                        </div>
+                        ${detail.kategori === 'ibu' ? `
+                        <div class="bg-pos-bg border border-pos-border rounded-lg p-2.5">
+                            <span class="block text-[9px] font-extrabold text-pos-muted uppercase tracking-wider mb-1">Hamil Anak ke</span>
+                            <span class="text-xs font-extrabold text-pos-navy">${detail.anakKe || '-'}</span>
+                        </div>
+                        <div class="bg-pos-bg border border-pos-border rounded-lg p-2.5">
+                            <span class="block text-[9px] font-extrabold text-pos-muted uppercase tracking-wider mb-1">Usia Kehamilan</span>
+                            <span class="text-xs font-extrabold text-pos-navy">${detail.usiaHamil ? detail.usiaHamil + ' minggu' : '-'}</span>
+                        </div>
+                        ` : ''}
+                        <div class="bg-pos-bg border border-pos-border rounded-lg p-2.5 col-span-2">
+                            <span class="block text-[9px] font-extrabold text-pos-muted uppercase tracking-wider mb-1">Tanggal Kunjungan Terakhir</span>
+                            <span class="text-xs font-extrabold text-pos-navy">${detail.tglKunjungan ? new Date(detail.tglKunjungan).toLocaleDateString('id-ID', {day:'2-digit',month:'long',year:'numeric'}) : '-'}</span>
                         </div>
                     </div>
                 </div>
             `;
+
             
             // 3. Render 4 Langkah Accordion
             let stepsHtml = '';
@@ -568,9 +736,10 @@
                                     <i class="ti ti-pointer text-[12px] text-pos-teal"></i>
                                     <span>Aksi</span>
                                 </label>
-                                <button onclick="selectPemeriksaan(${pIdx})" class="w-full px-3 py-2.5 border ${isSelected ? 'border-pos-teal bg-pos-teal text-white' : 'border-pos-border bg-white text-pos-navy'} hover:border-pos-teal hover:bg-pos-teal-light hover:text-pos-teal-dark rounded-lg text-[11px] font-extrabold transition-all duration-200 flex items-center justify-center gap-1 shadow-sm">
-                                    <span>Lihat Detail Riwayat</span>
-                                </button>
+                                <a href="/riwayat?id=${detail.id}&pemeriksaan_id=${pemeriksaan.id}" class="w-full px-3 py-2.5 border border-pos-border bg-white text-pos-navy hover:border-pos-teal hover:bg-pos-teal-light hover:text-pos-teal-dark rounded-lg text-[11px] font-extrabold transition-all duration-200 flex items-center justify-center gap-1 shadow-sm no-underline">
+                                    <i class="ti ti-external-link text-[12px]"></i>
+                                    <span>Lihat Detail</span>
+                                </a>
                             </div>
                         </div>
                     `;

@@ -37,10 +37,15 @@ class AkunController extends Controller
         $data = $request->validate([
             'name'      => 'required|string|max:100',
             'email'     => 'required|email|unique:users,email',
+            'photo'     => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'password'  => 'required|string|min:6|confirmed',
             'role'      => 'required|in:admin,petugas',
             'is_active' => 'boolean',
         ]);
+
+        if ($request->hasFile('photo')) {
+            $data['photo'] = $request->file('photo')->store('photos', 'public');
+        }
 
         $data['password'] = Hash::make($data['password']);
         $user = User::create($data);
@@ -57,10 +62,18 @@ class AkunController extends Controller
         $data = $request->validate([
             'name'      => 'sometimes|required|string|max:100',
             'email'     => 'sometimes|required|email|unique:users,email,'.$user->id,
+            'photo'     => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'password'  => 'nullable|string|min:6|confirmed',
             'role'      => 'sometimes|required|in:admin,petugas',
             'is_active' => 'boolean',
         ]);
+
+        if ($request->hasFile('photo')) {
+            if ($user->photo) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->photo);
+            }
+            $data['photo'] = $request->file('photo')->store('photos', 'public');
+        }
 
         if (!empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);

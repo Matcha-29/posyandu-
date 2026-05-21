@@ -208,7 +208,7 @@
     </aside>
 
     <!-- ══ MAIN ═════════════════════════════════════════════ -->
-    <main class="main ml-[260px] flex-1 px-10 py-9 min-h-screen">
+    <main class="main ml-[260px] flex-1 min-w-0 px-10 py-9 min-h-screen">
         @yield('content')
     </main>
 

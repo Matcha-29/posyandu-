@@ -14,7 +14,7 @@
                 <i class="ti ti-plus text-base"></i> Tambah Akun
             </button>
             <div class="admin-badge flex items-center gap-3 bg-white border border-pos-gray-100 rounded-full px-4 py-2 shadow-pos-shadow">
-                <img class="w-10 h-10 rounded-full object-cover border border-pos-green-light" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&h=80&q=80" alt="Admin" />
+                <img class="w-10 h-10 rounded-full object-cover border border-pos-green-light" src="{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&h=80&q=80' }}" alt="Admin" />
                 <div class="text-left">
                     <p class="text-xs font-bold leading-none text-pos-gray-900">{{ Auth::user()->name }}</p>
                     <p class="text-[9px] font-bold text-pos-gray-500 uppercase tracking-widest mt-1">{{ Auth::user()->role }}</p>
@@ -44,7 +44,12 @@
             <tbody>
                 @foreach($users as $u)
                 <tr>
-                    <td class="!font-bold !text-pos-gray-900">{{ $u->name }}</td>
+                    <td class="!font-bold !text-pos-gray-900">
+                        <div class="flex items-center gap-3">
+                            <img class="w-10 h-10 rounded-full object-cover border border-pos-gray-200" src="{{ $u->photo ? asset('storage/' . $u->photo) : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&h=80&q=80' }}" alt="Avatar" />
+                            <span>{{ $u->name }}</span>
+                        </div>
+                    </td>
                     <td>{{ $u->email }}</td>
                     <td>
                         <span class="px-3 py-1.5 rounded-full text-[10px] font-extrabold uppercase {{ $u->role == 'admin' ? 'bg-[#eef2f0] text-pos-gray-900' : 'bg-pos-green-pale text-pos-green-dark' }}">
@@ -83,16 +88,20 @@
 
     <!-- Modal Form -->
     <div id="modalUser" class="hidden fixed inset-0 bg-black/60 z-[200] items-center justify-center backdrop-blur-sm p-4">
-        <div class="bg-white rounded-pos-radius w-full max-w-md overflow-hidden shadow-pos-shadow-lg animate-[fade-up_0.3s_ease]">
-            <div class="bg-pos-green-dark p-6 text-white flex justify-between items-center border-b border-white/10">
+        <div class="bg-white rounded-pos-radius w-full max-w-md overflow-hidden shadow-pos-shadow-lg animate-[fade-up_0.3s_ease] flex flex-col max-h-[95vh]">
+            <div class="bg-pos-green-dark p-6 text-white flex justify-between items-center border-b border-white/10 shrink-0">
                 <h3 class="font-extrabold text-lg flex items-center gap-2" id="modalTitle">
                     <i class="ti ti-user-plus"></i> Tambah Akun
                 </h3>
                 <button onclick="closeModal()" class="text-2xl leading-none hover:opacity-75 transition-opacity">&times;</button>
             </div>
-            <form id="userForm" action="/data_akun" method="POST" class="p-6 space-y-5">
+            <form id="userForm" action="/data_akun" method="POST" enctype="multipart/form-data" class="p-6 space-y-5 overflow-y-auto grow custom-scrollbar">
                 @csrf
                 <div id="methodField"></div>
+                <div>
+                    <label class="block text-[11px] font-extrabold text-pos-gray-900 mb-1.5 uppercase tracking-wider">Foto Profil (Opsional)</label>
+                    <input type="file" name="photo" id="fPhoto" accept="image/png, image/jpeg, image/jpg" class="w-full px-4 py-3 border border-pos-gray-100 rounded-pos-radius text-sm focus:border-pos-green-mid outline-none bg-pos-gray-50 focus:bg-white transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-pos-green-pale file:text-pos-green-dark hover:file:bg-pos-green-mid hover:file:text-white" />
+                </div>
                 <div>
                     <label class="block text-[11px] font-extrabold text-pos-gray-900 mb-1.5 uppercase tracking-wider">Nama Lengkap</label>
                     <input type="text" name="name" id="fName" required class="w-full px-4 py-3 border border-pos-gray-100 rounded-pos-radius text-sm focus:border-pos-green-mid outline-none bg-pos-gray-50 focus:bg-white transition-all" />

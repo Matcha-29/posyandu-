@@ -69,6 +69,7 @@
                         <option value="">Semua Kategori</option>
                         <option value="ibu" {{ request('kategori') == 'ibu' ? 'selected' : '' }}>Ibu Hamil</option>
                         <option value="balita" {{ request('kategori') == 'balita' ? 'selected' : '' }}>Balita</option>
+                        <option value="lansia" {{ request('kategori') == 'lansia' ? 'selected' : '' }}>Lansia</option>
                     </select>
                 </div>
                 <div class="flex gap-2">
@@ -104,8 +105,8 @@
                                 <p class="text-[10px] text-pos-muted font-bold tracking-tight uppercase">{{ $p->patient->nik }}</p>
                             </td>
                             <td class="px-6 py-4">
-                                <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase {{ $p->patient->kategori == 'ibu' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700' }}">
-                                    {{ $p->patient->kategori == 'ibu' ? 'Ibu Hamil' : 'Balita' }}
+                                <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase {{ $p->patient->kategori == 'ibu' ? 'bg-orange-100 text-orange-700' : ($p->patient->kategori == 'balita' ? 'bg-blue-100 text-blue-700' : 'bg-teal-100 text-teal-700') }}">
+                                    {{ $p->patient->kategori == 'ibu' ? 'Ibu Hamil' : ($p->patient->kategori == 'balita' ? 'Balita' : 'Lansia') }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-sm text-pos-muted font-medium">{{ optional($p->petugas)->name ?? 'Tidak Ada' }}</td>

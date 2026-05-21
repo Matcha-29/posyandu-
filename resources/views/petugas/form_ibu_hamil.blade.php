@@ -213,8 +213,7 @@
 </head>
 <body>
 
-<div class="top-bar">
-</div>
+@include('layouts.header_step')
 
 <div class="wrapper">
     <div class="page-title-btn">FORM PENDAFTARAN PASIEN</div>
@@ -280,14 +279,7 @@
                         <label>Hamil Anak ke :</label>
                         <input type="number" id="hamilAnakKe" placeholder="" min="1" />
                     </div>
-                    <div class="form-group">
-                        <label>Berat Badan (kg) :</label>
-                        <input type="number" id="beratBadan" placeholder="" step="0.1" />
-                    </div>
-                    <div class="form-group">
-                        <label>Tinggi Badan :</label>
-                        <input type="number" id="tinggiBadan" placeholder="" />
-                    </div>
+
 
                     <!-- Simpan -->
                     <div class="btn-simpan-wrap">
